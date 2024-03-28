@@ -1,0 +1,43 @@
+Android Notebook Wifi Server.  Probably.  Tether to physical.  Select network.  
+X Program to load-save parameters in database.
+X Chage Node-Red so that IP and Ezama-Net get updated.
+On Initial Startup, only have to select paired EZAMA.  Log IN to local wireless and request parameters.
+Then restart with full params.  
+Have timer that logs into local and requests parameters after 5 min.  
+Esp should only update parameters if mismatch.  
+Keep timer going.
+Test:
+sudo ifconfig eth0 down
+sudo ifconfig eth0 up
+
+The main issue: 2 networks to communicate with, or use some sort of time splitting.
+
+The only problem I had was that after re-booting the pi my hot-spot ceased to be fully functional. The problem was traced/fixed to the "interfaces" configuration file located in the "/etc/network" directory.
+
+The line which reads "#allow-hotplug wlan0" is commented out by default. Removing the "#" at the start of the line corrected the problem and the R3 stand-alone-server now functions correctly after re-boot every time.
+
+/etc/dhcpcd.conf, add:
+
+interface wlan0_1
+static ip_address=10.10.2.1/16
+nohook wpa_supplicant
+
+/etc/wpa_supplicant/wpa_supplicant-wlan0_1.conf, add:
+country=US  # Set your country code
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+    ssid="your_wifi_ssid"
+    psk="your_wifi_password"
+}
+
+Start the managed connenction:
+sudo wpa_supplicant -B -c /etc/wpa_supplicant/wpa_supplicant-wlan0_1.conf -i wlan0_1
+
+N 1. Bard's running two
+N 1.5 Bard with bluetooth?
+N 2. youtube running two?
+3. Raspi / BLE example
+
+WOW, ok I got BT working.  bt_test.py and bt_raspi are the models.  bt_test.py needs the MAC addresses of the ESP32 bluetooth addresses.  Also, it looks like the ESP32 cannot send anything to the raspi.  Might be okay.

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Toggle Switches</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            text-align: center; /* Center align content horizontally */
+            margin: 0;
+        }
+
+        /* Updated styling for labels "Ch1" and "Ch2" */
+        .switch-label {
+            margin-right: 10px;
+            font-size: 24px; /* Bigger font size */
+            font-weight: bold; /* Bolder font weight */
+            font-family: 'Arial Black', sans-serif; /* Fancier font */
+            color: #2196F3; /* Blue color */
+            display: inline-block; /* Prevent labels from breaking to new lines */
+        }
+
+        .channel {
+            margin-bottom: 20px; /* Add vertical spacing between channels */
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            border-radius: 30px;
+            transition: 0.4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Style for the sections */
+        .section {
+            margin-top: 20px; /* Add spacing between sections */
+        }
+    </style>
+</head>
+<body>
+
+<div class="channel">
+    <span class="switch-label">Ch1 :</span> <!-- Updated label for "Ch1" -->
+    <meter id="meterAmps1" value="[Amps1_TRMS]" min="0" max="20"></meter>
+    <label class="switch">
+        <input type="checkbox" id="toggleGPIO25" checked>
+        <span class="slider"></span>
+    </label>
+</div>
+
+<div class="channel">
+    <span class="switch-label">Ch2 :</span> <!-- Updated label for "Ch2" -->
+    <meter id="meterAmps2" value="[Amps2_TRMS]" min="0" max="20"></meter>
+    <label class="switch">
+        <input type="checkbox" id="toggleGPIO22" checked>
+        <span class="slider"></span>
+    </label>
+</div>
+
+</body>
+</html>
