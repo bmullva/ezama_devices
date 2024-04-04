@@ -4,7 +4,7 @@
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type_ = "Light Hub";
-String ver = "10.0";
+String ver = "10.1";
 
 //const char* a_pin_name = "amps";
 //float amp = (p36-1.65)/.1
@@ -271,7 +271,7 @@ void setup() {
   
   //pinMode(A0, INPUT);
   pinMode(32, OUTPUT);  //LED11HIGH
-  pinMode(33, INPUT);   //LED11LOW
+  pinMode(33, OUTPUT);   //LED11LOW
   pinMode(25, OUTPUT);  //LED09
   pinMode(26, OUTPUT);  //LED07
   pinMode(27, OUTPUT);  //LED05
