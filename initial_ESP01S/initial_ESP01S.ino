@@ -1,11 +1,12 @@
 #include <Ezama10_1.h>
 
 
+//https://www.ezama.tech/ez/ard/esp_number?increment=True 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type = "Initial";
 String ver = "10.1";
 int addr = 222;
-char id[] = "0000005J";
+char id[] = "0000005N";
 
 
 // 2 REPORT (SENT EVERY 6 SECONDS)

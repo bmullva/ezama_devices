@@ -68,17 +68,17 @@ void publish_reporting_json() {
 void receive_controls_json(String topic, String msg) {
   //these are for the "NAC" topics from a physical switch.
   for (int i = 1; i<=1; i++) {        
-    if (topic == String(device_id) + "/" + String("AC") + String(i)) {
+    if (topic == String(device_id) + "/" + String("AConOff") + String(i)) {
         onOff_array[i] = 1-onOff_array[i];  // any msg will switch between 1 and 0
     }
   }
-  digitalWrite(0, onOff_array[1]);   // AC1
+  digitalWrite(1, onOff_array[1]);   // AC1
 }
 
 
 // 5 PUBLISH AND SEND CONTROLS (publish_controls only if controller module)
 void publish_controls_json(String pin_name, String pin_msg) {
-  String topic = String(device_id) + "/" + "1";
+  String topic = String(device_id) + "/1";
   client.publish(topic.c_str(), pin_msg.c_str());
 }
 
@@ -99,11 +99,11 @@ void setup() {
   Serial.begin(115200);
   ezama_setup();  //in ezama.h
   
-  pinMode(1, INPUT_PULLUP);
-  pinMode(0, OUTPUT);  //AC1
-  digitalWrite(0, HIGH);    //AC1
+  pinMode(0, INPUT_PULLUP);
+  pinMode(1, OUTPUT);  //AC1
+  digitalWrite(1, HIGH);    //AC1
   delay(5000);
-  digitalWrite(0, LOW);    //AC1
+  digitalWrite(1, LOW);    //AC1
   specific_connect();
 }
 
@@ -115,15 +115,18 @@ void loop() {
   ezama_loop();  //in ezama.h
 
   // Loop through an array of digital pins, read their states, and store the readings
-  for(int i=0;i<sizeof(d_pin_reading)/sizeof(d_pin_reading[0]);i++) {
+  //for(int i=0;i<sizeof(d_pin_reading)/sizeof(d_pin_reading[0]);i++) {
+    int i = 0;
     d_pin_reading[i] = digitalRead(i);
 
     // Loop through a set of conditions for the pins
-    if (d_pin_n1_reading[i] != LOW && d_pin_reading[i]) {
-          publish_controls_json(String(i), "switch");
+    if (d_pin_n1_reading[i] != d_pin_reading[i]) {
+          publish_controls_json(String(i), "click");
+          onOff_array[i+1] = 1-onOff_array[i+1];
           d_pin_n1_reading[i] = d_pin_reading[i];
+          digitalWrite(i+1, onOff_array[1]);   // AC1
     }
-  }
+  //}
   
   delay(50);
 }
