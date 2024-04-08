@@ -23,7 +23,7 @@ void setup() {
 
   // Start the OTA update server
   ArduinoOTA.begin();
-  ArduinoOTA.setPassword("password"); // Set your own password here
+  //ArduinoOTA.setPassword("password"); // Set your own password here
   Serial.println("OTA server started");
 
   // Set up routes for OTA updates
