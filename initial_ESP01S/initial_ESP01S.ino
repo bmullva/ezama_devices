@@ -1,12 +1,12 @@
-#include <Ezama10_1.h>
+#include <Ezama11.h>
 
 
 //https://www.ezama.tech/ez/ard/esp_number?increment=True 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type = "Initial";
-String ver = "10.1";
+String ver = "11";
 int addr = 222;
-char id[] = "0000005N";
+char id[] = "0000005S";
 
 
 // 2 REPORT (SENT EVERY 6 SECONDS)
@@ -58,7 +58,8 @@ void setup() {
   EEPROM.write(230, 's');
   EEPROM.commit();
 
-  digitalWrite(2, LOW);
+  pinMode(LED_PIN, OUTPUT); // Set the LED pin as an output
+  digitalWrite(LED_PIN, HIGH); // Turn on the LED
   ezama_setup();
 }
 
