@@ -4,9 +4,9 @@
 //https://www.ezama.tech/ez/ard/esp_number?increment=True 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type = "Initial";
-String ver = "11";
+String ver = "11.0";
 int addr = 222;
-char id[] = "0000005U";
+char id[] = "0000005M";
 
 
 // 2 REPORT (SENT EVERY 6 SECONDS)
