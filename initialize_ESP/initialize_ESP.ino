@@ -6,7 +6,7 @@
 String type = "Initial";
 String ver = "11";
 int addr = 222;
-char id[] = "0000005S";
+char id[] = "0000005U";
 
 
 // 2 REPORT (SENT EVERY 6 SECONDS)
@@ -62,9 +62,10 @@ void setup() {
   EEPROM.write(230, 's');
   EEPROM.commit();
 
+  ezama_setup();
+  
   pinMode(LED_BUILTIN, OUTPUT); // Set the LED pin as an output
   digitalWrite(LED_BUILTIN, HIGH); // Turn on the LED
-  ezama_setup();
 }
 
 

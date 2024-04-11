@@ -135,7 +135,7 @@ void receive_controls_json(String topic, String msg) {
   analogWrite(18, dim_amt(lux_array[2]) *     temp_array[2]   * onOff_array[2] /100 );    //2High
   analogWrite(19, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );    //2Low
   analogWrite(27, dim_amt(lux_array[3]) *     temp_array[3]   * onOff_array[3] /100 );    //3High
-  analogWrite(36, dim_amt(lux_array[3]) * (255-temp_array[3]) * onOff_array[3] /100 );    //3Low
+  analogWrite(26, dim_amt(lux_array[3]) * (255-temp_array[3]) * onOff_array[3] /100 );    //3Low
   analogWrite(16, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );    //4High
   analogWrite(17, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );    //4Low
 
@@ -239,12 +239,12 @@ void loop() {
           analogWrite(19, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );     //2Low
         }
         if (i == 3) {
-          analogWrite(25,  dim_amt(lux_array[3]) *     temp_array[3]   * onOff_array[3] /100 );    //3High
-          analogWrite(33, dim_amt(lux_array[3]) * (255-temp_array[3]) * onOff_array[3] /100 );     //3Low
+          analogWrite(27,  dim_amt(lux_array[3]) *     temp_array[3]   * onOff_array[3] /100 );    //3High
+          analogWrite(26, dim_amt(lux_array[3]) * (255-temp_array[3]) * onOff_array[3] /100 );     //3Low
         }
         if (i == 4){
-          analogWrite(18, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
-          analogWrite(19, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
+          analogWrite(16, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
+          analogWrite(17, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
         }  
         Serial.println("I am dimming in the 1-4 main loop");
       }
@@ -263,12 +263,12 @@ void loop() {
           analogWrite(19, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );     //2Low
         }
         if (i == 3) {
-          analogWrite(25,  dim_amt(lux_array[3]) *     temp_array[3]   * onOff_array[3] /100 );    //3High
-          analogWrite(33, dim_amt(lux_array[3]) * (255-temp_array[3]) * onOff_array[3] /100 );     //3Low
+          analogWrite(27,  dim_amt(lux_array[3]) *     temp_array[3]   * onOff_array[3] /100 );    //3High
+          analogWrite(26, dim_amt(lux_array[3]) * (255-temp_array[3]) * onOff_array[3] /100 );     //3Low
         }
         if (i == 4){
-          analogWrite(18, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
-          analogWrite(19, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
+          analogWrite(16, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
+          analogWrite(17, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
         }  
         Serial.println("I am brightening in the 1-4 main loop");
       }
@@ -288,12 +288,12 @@ void loop() {
           analogWrite(19, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );     //2Low
         }
         if (i == 3) {
-          analogWrite(25,  dim_amt(lux_array[3]) *     temp_array[3]   * onOff_array[3] /100 );    //3High
-          analogWrite(33, dim_amt(lux_array[3]) * (255-temp_array[3]) * onOff_array[3] /100 );     //3Low
+          analogWrite(27,  dim_amt(lux_array[3]) *     temp_array[3]   * onOff_array[3] /100 );    //3High
+          analogWrite(36, dim_amt(lux_array[3]) * (255-temp_array[3]) * onOff_array[3] /100 );     //3Low
         }
         if (i == 4){
-          analogWrite(18, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
-          analogWrite(19, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
+          analogWrite(16, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
+          analogWrite(17, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
         }   
         Serial.println("I am heating in the 1-4 main loop");
       }
@@ -314,12 +314,12 @@ void loop() {
           analogWrite(19, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );     //2Low
         }
         if (i == 3) {
-          analogWrite(25,  dim_amt(lux_array[3]) *     temp_array[3]   * onOff_array[3] /100 );    //3High
-          analogWrite(33, dim_amt(lux_array[3]) * (255-temp_array[3]) * onOff_array[3] /100 );     //3Low
+          analogWrite(27,  dim_amt(lux_array[3]) *     temp_array[3]   * onOff_array[3] /100 );    //3High
+          analogWrite(36, dim_amt(lux_array[3]) * (255-temp_array[3]) * onOff_array[3] /100 );     //3Low
         }
         if (i == 4){
-          analogWrite(18, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
-          analogWrite(19, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
+          analogWrite(16, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
+          analogWrite(17, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
         } 
         
         Serial.println("I am cooling in the 1-4 main loop");

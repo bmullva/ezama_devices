@@ -127,10 +127,10 @@ void receive_controls_json(String topic, String msg) {
 
   //NAC DOES NOT EXIST on this Light Hub
 
-  analogWrite(0, dim_amt(lux_array[1]) *     temp_array[1]   * onOff_array[1] /100 );    //1Low
-  analogWrite(1, dim_amt(lux_array[1]) * (255-temp_array[1]) * onOff_array[1] /100 );    //1High
-  analogWrite(2, dim_amt(lux_array[2]) *     temp_array[2]   * onOff_array[2] /100 );    //2Low
-  analogWrite(3, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );    //2High
+  analogWrite(0, dim_amt(lux_array[1]) * (255-temp_array[1]) * onOff_array[1] /100 );    //1Low
+  analogWrite(1, dim_amt(lux_array[1]) *     temp_array[1]   * onOff_array[1] /100 );    //1High
+  analogWrite(2, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );    //2Low
+  analogWrite(3, dim_amt(lux_array[2]) *     temp_array[2]   * onOff_array[2] /100 );    //2High
 
 }
 
@@ -172,22 +172,22 @@ void setup() {
   ezama_setup();  //in ezama.h
   
   //pinMode(A0, INPUT);
-  pinMode(0, OUTPUT);  // 1HIGH
-  pinMode(1, OUTPUT);  // 1LOW
-  pinMode(2, OUTPUT);  // 2HIGH
-  pinMode(3, OUTPUT);  // 2LOW
+  pinMode(0, OUTPUT);  // 1LOW
+  pinMode(1, OUTPUT);  // 1HIGH
+  pinMode(2, OUTPUT);  // 2LOW
+  pinMode(3, OUTPUT);  // 2HIGH
 
-  digitalWrite(0, HIGH);    // 1HIGH
-  digitalWrite(1, HIGH);    // 1LOW
-  digitalWrite(2, HIGH);    // 2HIGH
-  digitalWrite(3, HIGH);    // 2LOW
+  digitalWrite(0, HIGH);    // 1LOW
+  digitalWrite(1, HIGH);    // 1HIGH
+  digitalWrite(2, HIGH);    // 2LOW
+  digitalWrite(3, HIGH);    // 2HIGH
 
   delay(2000);
 
-  digitalWrite(0, LOW);    // 1HIGH
-  digitalWrite(1, LOW);    // 1LOW
-  digitalWrite(2, LOW);    // 2HIGH
-  digitalWrite(3, LOW);    // 2LOW
+  digitalWrite(0, LOW);    // 1LOW
+  digitalWrite(1, LOW);    // 1HIGH
+  digitalWrite(2, LOW);    // 2LOW
+  digitalWrite(3, LOW);    // 2HIGH
 
   specific_connect();
 }
@@ -200,71 +200,57 @@ void loop() {
   
   for(int i=1;i<=2;i++) {
     if(lt_array[i] == 1){   // like increasing the dim slider
-      Serial.print("lt_array[i]=1 and i is:");
-      Serial.println(i);
       if (lux_array[i] >= 0 && lux_array[i] < 94) {
         lux_array[i] += 1;
         if (i == 1) {
-          analogWrite(0, dim_amt(lux_array[1]) *    temp_array[1]       * onOff_array[1] /100 );    //1Low
-          analogWrite(1, dim_amt(lux_array[1]) * (255-temp_array[1])    * onOff_array[1] /100 );    //1High
+          analogWrite(0, dim_amt(lux_array[1]) * (255-temp_array[1])    * onOff_array[1] /100 );    //1Low
+          analogWrite(1, dim_amt(lux_array[1]) *    temp_array[1]       * onOff_array[1] /100 );    //1High
         }
         if (i == 2){
-          analogWrite(2, dim_amt(lux_array[2]) *    temp_array[2]      * onOff_array[2] /100 );     //2Low
-          analogWrite(3, dim_amt(lux_array[2]) * (255-temp_array[2])   * onOff_array[2] /100 );     //2High
+          analogWrite(2, dim_amt(lux_array[2]) * (255-temp_array[2])   * onOff_array[2] /100 );     //2Low
+          analogWrite(3, dim_amt(lux_array[2]) *    temp_array[2]      * onOff_array[2] /100 );     //2High
         }
-        Serial.println("I am dimming in the 1-2 main loop");
       }
     }
     if(lt_array[i] == -1){  // like decreasing the dim slider
-      Serial.print("lt_array [i]=-1 and i is:");
-      Serial.println(i);
       if (lux_array[i] > 5 && lux_array[i] <= 100) {
         lux_array[i] -= 1;
         if (i == 1) {
-          analogWrite(0,  dim_amt(lux_array[1]) *     temp_array[1]   * onOff_array[1] /100 );    //1High
-          analogWrite(1, dim_amt(lux_array[1]) * (255-temp_array[1]) * onOff_array[1] /100 );     //1Low
+          analogWrite(0,  dim_amt(lux_array[1]) *     temp_array[1]   * onOff_array[1] /100 );    //1Low
+          analogWrite(1, dim_amt(lux_array[1]) * (255-temp_array[1]) * onOff_array[1] /100 );     //1High
         }
         if (i == 2){
-          analogWrite(2, dim_amt(lux_array[2]) *     temp_array[2]   * onOff_array[2] /100 );     //2High
-          analogWrite(3, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );     //2Low
+          analogWrite(2, dim_amt(lux_array[2]) *     temp_array[2]   * onOff_array[2] /100 );     //2Low
+          analogWrite(3, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );     //2High
         }
-        Serial.println("I am brightening in the 1-2 main loop");
       }
     }
-    if(lt_array[i+2] == 1){   // like increasing the temp slider
-      Serial.print("lt_array[i]=1 and i is:");
-      Serial.println(i);     
+    if(lt_array[i+2] == 1){   // like increasing the temp slider  
       if (temp_array[i] >= 0 && temp_array[i] < 255) {
         temp_array[i] += 5;
         if (temp_array[i] >= 255) {temp_array[i] = 255;}
         if (i == 1) {
-          analogWrite(0,  dim_amt(lux_array[1]) *     temp_array[1]   * onOff_array[1] /100 );    //1High
-          analogWrite(1, dim_amt(lux_array[1]) * (255-temp_array[1]) * onOff_array[1] /100 );     //1Low
+          analogWrite(0,  dim_amt(lux_array[1]) *     temp_array[1]   * onOff_array[1] /100 );    //1Low
+          analogWrite(1, dim_amt(lux_array[1]) * (255-temp_array[1]) * onOff_array[1] /100 );     //1High
         }
         if (i == 2){
-          analogWrite(2, dim_amt(lux_array[2]) *     temp_array[2]   * onOff_array[2] /100 );     //2High
-          analogWrite(3, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );     //2Low
+          analogWrite(2, dim_amt(lux_array[2]) *     temp_array[2]   * onOff_array[2] /100 );     //2Low
+          analogWrite(3, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );     //2High
         }
-        Serial.println("I am heating in the 1-4 main loop");
       }
     }
-    if(lt_array[i+2] == -1){  // like decreasing the temp slider
-      Serial.print("lt_array [i]=-1 and i is:");
-      Serial.println(i);
-      
+    if(lt_array[i+2] == -1){  // like decreasing the temp slider 
       if (temp_array[i] > 0 && temp_array[i] <= 255) {
         temp_array[i] -= 5;
         if (temp_array[i] <= 0) {temp_array[i] = 0;}
         if (i == 1) {
-          analogWrite(0,  dim_amt(lux_array[1]) *     temp_array[1]   * onOff_array[1] /100 );    //1High
-          analogWrite(1, dim_amt(lux_array[1]) * (255-temp_array[1]) * onOff_array[1] /100 );     //1Low
+          analogWrite(0,  dim_amt(lux_array[1]) *     temp_array[1]   * onOff_array[1] /100 );    //1Low
+          analogWrite(1, dim_amt(lux_array[1]) * (255-temp_array[1]) * onOff_array[1] /100 );     //1High
         }
         if (i == 2){
-          analogWrite(2, dim_amt(lux_array[2]) *     temp_array[2]   * onOff_array[2] /100 );     //2High
-          analogWrite(3, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );     //2Low
+          analogWrite(2, dim_amt(lux_array[2]) *     temp_array[2]   * onOff_array[2] /100 );     //2Low
+          analogWrite(3, dim_amt(lux_array[2]) * (255-temp_array[2]) * onOff_array[2] /100 );     //2high
         }
-        
-        Serial.println("I am cooling in the 1-4 main loop");
       }
     }
   }
