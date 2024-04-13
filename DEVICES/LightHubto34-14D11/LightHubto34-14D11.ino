@@ -51,10 +51,6 @@ void publish_reporting_json() {
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
   client.publish(topic.c_str(), sj);
-  Serial.print("Returning State json: ");
-  Serial.print(topic);
-  Serial.println(sj);
-  
 }
 
 
@@ -154,9 +150,6 @@ void specific_connect() {
   
   topic = String(device_id)+"/"+String("amp");
   client.subscribe(topic.c_str());
-  if (!client.subscribe(topic.c_str())) {
-        Serial.println("Failed to subscribe to topic: " + topic);
-  }
 
   for (int i = 1; i<=4; i++) {        
     topic = String(device_id)+"/"+String(i);
@@ -166,9 +159,6 @@ void specific_connect() {
   for (int i = 1; i <= 4; i++) {
     topic = String(device_id) + "/" + String("onOff") + String(i);
     client.subscribe(topic.c_str());
-    if (!client.subscribe(topic.c_str())) {
-        Serial.println("Failed to subscribe to topic: " + topic);
-    }
   }
 
   for (int i = 1; i<=4; i++) {        
@@ -181,7 +171,7 @@ void specific_connect() {
 }
 
 void setup() { 
-  Serial.begin(115200);
+  //Serial.begin(115200);
   ezama_setup();  //in ezama.h
   
   //pinMode(A0, INPUT);
@@ -226,8 +216,6 @@ void loop() {
   
   for(int i=1;i<=4;i++) {
     if(lt_array[i] == 1){   // like increasing the dim slider
-      Serial.print("lt_array[i]=1 and i is:");
-      Serial.println(i);
       if (lux_array[i] >= 0 && lux_array[i] < 94) {
         lux_array[i] += 1;
         if (i == 1) {
@@ -246,12 +234,10 @@ void loop() {
           analogWrite(16, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
           analogWrite(17, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
         }  
-        Serial.println("I am dimming in the 1-4 main loop");
+        // I am dimming in the 1-4 main loop
       }
     }
     if(lt_array[i] == -1){  // like decreasing the dim slider
-      Serial.print("lt_array [i]=-1 and i is:");
-      Serial.println(i);
       if (lux_array[i] > 5 && lux_array[i] <= 100) {
         lux_array[i] -= 1;
         if (i == 1) {
@@ -270,12 +256,10 @@ void loop() {
           analogWrite(16, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
           analogWrite(17, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
         }  
-        Serial.println("I am brightening in the 1-4 main loop");
+        //I am brightening in the 1-4 main loop
       }
     }
     if(lt_array[i+4] == 1){   // like increasing the temp slider
-      Serial.print("lt_array[i]=1 and i is:");
-      Serial.println(i);     
       if (temp_array[i] >= 0 && temp_array[i] < 255) {
         temp_array[i] += 5;
         if (temp_array[i] >= 255) {temp_array[i] = 255;}
@@ -295,12 +279,10 @@ void loop() {
           analogWrite(16, dim_amt(lux_array[4]) *     temp_array[4]   * onOff_array[4] /100 );     //4High
           analogWrite(17, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
         }   
-        Serial.println("I am heating in the 1-4 main loop");
+        //"I am heating in the 1-4 main loop"
       }
     }
     if(lt_array[i+4] == -1){  // like decreasing the temp slider
-      Serial.print("lt_array [i]=-1 and i is:");
-      Serial.println(i);
       
       if (temp_array[i] > 0 && temp_array[i] <= 255) {
         temp_array[i] -= 5;
@@ -322,7 +304,7 @@ void loop() {
           analogWrite(17, dim_amt(lux_array[4]) * (255-temp_array[4]) * onOff_array[4] /100 );     //4Low
         } 
         
-        Serial.println("I am cooling in the 1-4 main loop");
+        //I am cooling in the 1-4 main loop
       }
     }
   }

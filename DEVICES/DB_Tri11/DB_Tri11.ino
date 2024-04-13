@@ -14,10 +14,9 @@ int dim_amt (int dim) {
 }
 
 
-//VIRTUAL:
-//lux 1-100
-//onOff 0, 1
-//temp 0-255
+//VIRTUAL: 1,2,3 Are Red, Green, and Blue
+//device_id/onOffN: should accept: anything, "on", "off"
+//device_id/luxN: should accept: 5-100
 // onOff_array: onOff 0, 1: {NA, 1, 2, 3};
 // lux_array:  lux 0-100 {NA, lux1, lux2, lux3};
 
@@ -25,12 +24,7 @@ int onOff_array[]  = {-99, 0, 0, 0};
 int lux_array[]    = {-99, 0, 0, 0};
  
 
-//PHYSICAL:
-//device_id/N N=1-3: should accep NONE "hold", "click", "click-hold", "dbl-click", "release"
-//device_id/N NONE should accept "click", "on", "off", "dim", "brighten", "heat", "cool"
-// +1 -1 or 0: lt_array:  NA, lm1, lm2, lm3, lm4, lm5, lm6, lm7, lm8, lm9, lm10, lm11Lux, lm12Lux, lm11Temp, lm12Temp
-//int lt_array []    = {-99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int mom_pin_array[]= {-99,0,1,2};
+//PHYSICAL: NONE!
 
 
 
@@ -51,10 +45,6 @@ void publish_reporting_json() {
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
   client.publish(topic.c_str(), sj);
-  Serial.print("Returning State json: ");
-  Serial.print(topic);
-  Serial.println(sj);
-  
 }
 
 
@@ -66,148 +56,34 @@ void publish_reporting_json() {
 void receive_controls_json(String topic, String msg) {
   
   //VIRTUAL MSGS: 
-  // anything goes to device_id/NonOff, 1 ("click")
-  // numbers go to device device_id/Nlux, 5-100
-  // device_id/Ntemp 0-255
+  //device_id/onOffN: should accept: anything, "on", "off"
+  // numbers go to device device_id/luxN, 5-100
+  // device_id/tempN 0-255
 
   for (int i = 1; i<=3; i++) {        
     if (topic == String(device_id) + "/" + String("onOff") + String(i)) {
       onOff_array[i] = 1-onOff_array[i];  // any msg will switch between 1 and 0
+      if (msg == "on") {
+        onOff_array[i] = 1;
+      }
+      if (msg == "off") {
+        onOff_array[i] = 0;    
+      }
     }
   }
 
-  //for (int i = 1; i<=3; i++) {        
-  //  if (topic == String(device_id) + "/" + "AConOff" + String(i)) {
-  //    onOff_array[i+12] = 1-onOff_array[i+12];  // any msg will switch between 1 and 0
-  //  }
-  //}
-  
   for (int i = 1; i<=3; i++) {        
     if (topic == String(device_id) + "/" + "lux" + String(i)) {
       lux_array[i] = msg.toInt();  // msg to this topic should be value between 0-100
     }
   }
     
-  //for (int i = 11; i<=12; i++) {        
-  //  if (topic == String(device_id) + "/" + "temp" + String(i)) {
-  //    temp_array[i-11] = msg.toInt();  // msg to this topic should be value between 0-255
-  //  }
-  //}
 
-  //PHYSICAL MESSAGES
-  //device_id/N N=1-3: should accept: "click", NOT: "hold", "click-hold", "dbl-click", "release"
-  //change to also accept "on", "off", "dim", "brighten"
-  
-  //for (int i = 1; i<=10; i++) {        
-  //  if (topic == String(device_id) + "/" + String(i)) {
+  //PHYSICAL MESSAGES: NONE
 
-        //if (msg == "hold") {
-        //  lt_array[i] = 1;
-        //  Serial.println("Received dim signal in controls.");
-        //}
-        
-        //if (msg == "click") {
-        //  onOff_array[i] = 1 - onOff_array[i];
-        //  if (onOff_array[i] == 0) {lux_array[i] = 0;} // resets to max lum after turning off
-        //}
-
-        //if (msg == "click-hold") {
-        //  lt_array[i] = -1;
-        //  Serial.println("Received brighten signal in controls");
-        //}
-        
-        //if (msg == "dbl-click") {
-        //  
-        //}
-
-        //if (msg == "on") {
-        //  onOff_array[i] = 1;
-        //}
-        
-        //if (msg == "off") {
-        //  onOff_array[i] = 0;    
-        //}
-
-        //if (msg == "dim") {
-        //  lt_array[i] = 1;
-        //}
-
-        //if (msg == "brighten") {
-        //  lt_array[i] = -1;
-        //}
-        
-        //if (msg == "release") {
-        //  lt_array[i] = 0;
-        //  Serial.println("Received release signal in controls");
-        //}        
-    //}
-  //}
-
-  //device_id/N N=11,12 should accept "on", "off", "dim", "brighten", "heat", "cool", "release"
-  //lm11Lux, lm12Lux, lm11Temp, lm12Temp
-
-  //for (int i = 11; i<=12; i++) {        
-  //  if (topic == String(device_id) + "/" + String(i)) {
-        // msg to these topics should be "on", "off", "dim", "brighten", "heat", "cool", "release"
-               
-  //      if (msg == "on") {
-  //        onOff_array[i] = 1;
-  //      }
-
-  //      if (msg == "off") {
-  //        onOff_array[i] = 0;
-  //      }
-        
-  //      if (msg == "dim") {
-  //        lt_array[i] = 1;
-  //      }
-
-  //      if (msg == "brighten") {
-  //        lt_array[i] = -1;
-  //      }
-
-  //       if (msg == "heat") {
-  //        lt_array[i+2] = 1;
-  //      }
-        
-  //      if (msg == "cool") {
-  //        lt_array[i+2] = -1;
-  //      }
-
-  //      if (msg == "release") {
-  //        lt_array[i] = 0;
-  //        lt_array[i+2] = 0;
-  //      }
-  //  }
-  //}
-
-  //these are for the "NAC" topics from a physical switch.
-  //for (int i = 1; i<=3; i++) {        
-  //  if (topic == String(device_id) + "/" + String("AC") + String(i)) {
-  //      onOff_array[i+12] = 1-onOff_array[i+12];  // any msg will switch between 1 and 0g
-  //  }
-  //}
-
-
-  analogWrite(0, dim_amt(lux_array[1]) * 255 * onOff_array[1] /100 );    //01
-  analogWrite(1,  dim_amt(lux_array[2]) * 255 * onOff_array[2] /100 );    //02
-  analogWrite(2, dim_amt(lux_array[3]) * 255 * onOff_array[3] /100 );    //03
-  //analogWrite(16, dim_amt(lux_array[4]) * 255 * onOff_array[4] /100 );    //04
-  //analogWrite(27, dim_amt(lux_array[5]) * 255 * onOff_array[5] /100 );    //05
-  //analogWrite(17, dim_amt(lux_array[6]) * 255 * onOff_array[6] /100 );    //06
-  //analogWrite(26, dim_amt(lux_array[7]) * 255 * onOff_array[7] /100 );    //07
-  //analogWrite(18, dim_amt(lux_array[8]) * 255 * onOff_array[8] /100 );    //08
-  //analogWrite(25, dim_amt(lux_array[9]) * 255 * onOff_array[9] /100 );    //09
-  //analogWrite(19, dim_amt(lux_array[10]) * 255 * onOff_array[10] /100 );  //10
-
-  //analogWrite(32,  dim_amt(lux_array[11]) *     temp_array[0]   * onOff_array[11] /100 );    //11High
-  //analogWrite(33, dim_amt(lux_array[11]) * (255-temp_array[0]) * onOff_array[11] /100 );     //11Low
-  //analogWrite(23, dim_amt(lux_array[12]) *     temp_array[1]   * onOff_array[12] /100 );     //12High
-  //analogWrite(21, dim_amt(lux_array[12]) * (255-temp_array[1]) * onOff_array[12] /100 );     //12Low
-
-  //digitalWrite(22, onOff_array[13]);   // AC1
-  //digitalWrite(2,  onOff_array[14]);   // AC2
-  //digitalWrite(12, onOff_array[15]);   // AC3
+  analogWrite(0, dim_amt(lux_array[1]) * 255 * onOff_array[1] /100 );    //RED
+  analogWrite(1,  dim_amt(lux_array[2]) * 255 * onOff_array[2] /100 );   //GREEN
+  analogWrite(2, dim_amt(lux_array[3]) * 255 * onOff_array[3] /100 );    //BLUE
 }
 
 
@@ -221,17 +97,6 @@ void publish_controls_json(String pin_name, String pin_msg) {
 void specific_connect() {
   String topic {};
   
-  //topic = String(device_id)+"/"+String("amp");
-  //client.subscribe(topic.c_str());
-  //if (!client.subscribe(topic.c_str())) {
-  //      Serial.println("Failed to subscribe to topic: " + topic);
-  //}
-
-  //for (int i = 1; i<=3; i++) {        
-  //  topic = String(device_id)+"/"+String(i);
-  //  client.subscribe(topic.c_str());
-  //  }
-
   for (int i = 1; i <= 3; i++) {
     topic = String(device_id) + "/" + String("onOff") + String(i);
     client.subscribe(topic.c_str());
@@ -240,36 +105,24 @@ void specific_connect() {
   for (int i = 1; i<=3; i++) {        
     client.subscribe((String(device_id)+"/"+String("lux")+String(i)).c_str());
     }
-    
-  //for (int i = 11; i<=12; i++) {        
-  //  client.subscribe((String(device_id)+"/"+String("temp")+String(i)).c_str());
-  //  }
-    
-  //for (int i = 1; i<=3; i++) {        
-  //  client.subscribe((String(device_id)+"/"+String("AConOff")+String(i)).c_str());
-  //  }
-
-  //for (int i = 1; i<=3; i++) {        
-  //  client.subscribe((String(device_id)+"/"+String("AC")+String(i)).c_str());
-  //  }
 }
 
 void setup() { 
   Serial.begin(115200);
   ezama_setup();  //in ezama.h
   
-  //pinMode(A0, INPUT);
-  pinMode(0, OUTPUT);  //RED
+  pinMode(0, OUTPUT);   //RED
   pinMode(1, OUTPUT);   //GREEN
-  pinMode(2, OUTPUT);  //BLUE
+  pinMode(2, OUTPUT);   //BLUE
 
-  for (int i = 1; i<=3; i++) { 
-    digitalWrite(mom_pin_array[i], HIGH);    //01-10
+  for (int i = 0; i<=2; i++) { 
+    digitalWrite(i, HIGH);
   }
 
   delay(2000);
-  for (int i = 1; i<=10; i++) { 
-    digitalWrite(mom_pin_array[i], LOW);    //01-10
+  
+  for (int i = 0; i<=2; i++) { 
+    digitalWrite(i, LOW);
   }
 
   specific_connect();
@@ -282,98 +135,5 @@ void setup() {
 void loop() {
   ezama_loop();  //in ezama.h
   
-  /*
-  for(int i=1;i<=10;i++) {
-    if(lt_array[i] == 1){   // like increasing the dim slider
-      Serial.print("lt_array[i]=1 and lux[i] is:");
-      Serial.println(lux_array[i]);
-      if (lux_array[i] >= 0 && lux_array[i] < 94) {
-        lux_array[i] += 1;
-        analogWrite(mom_pin_array[i], dim_amt(lux_array[i]) * 255 * onOff_array[i] /100 );
-      }      
-    }
-    if(lt_array[i] == -1){  // like decreasing the dim slider
-      Serial.print("lt_array[i]=1 and i is:");
-      Serial.println(i);
-      if (lux_array[i] > 0 && lux_array[i] <= 100) {
-        lux_array[i] -= 1;
-        analogWrite(mom_pin_array[i], dim_amt(lux_array[i]) * 255 * onOff_array[i] /100 );
-      }
-    }
-  }
-  
-  
-  for(int i=11;i<=12;i++) {
-    if(lt_array[i] == 1){   // like increasing the dim slider
-      Serial.print("lt_array[i]=1 and i is:");
-      Serial.println(i);
-      if (lux_array[i] >= 0 && lux_array[i] < 94) {
-        lux_array[i] += 1;
-        if (i == 11) {
-          analogWrite(32,  dim_amt(lux_array[11]) *     temp_array[0]   * onOff_array[11] /100 );    //11High
-          analogWrite(33, dim_amt(lux_array[11]) * (255-temp_array[0]) * onOff_array[11] /100 );     //11Low
-        }
-        if (i == 12){
-          analogWrite(23, dim_amt(lux_array[12]) *     temp_array[1]   * onOff_array[12] /100 );     //12High
-          analogWrite(21, dim_amt(lux_array[12]) * (255-temp_array[1]) * onOff_array[12] /100 );     //12Low
-        }   
-        Serial.println("I am dimming in the 11-12 main loop");
-      }
-    }
-    if(lt_array[i] == -1){  // like decreasing the dim slider
-      Serial.print("lt_array [i]=-1 and i is:");
-      Serial.println(i);
-      if (lux_array[i] > 5 && lux_array[i] <= 100) {
-        lux_array[i] -= 1;
-        if (i == 11) {
-          analogWrite(32,  dim_amt(lux_array[11]) *     temp_array[0]   * onOff_array[11] /100 );    //11High
-          analogWrite(33, dim_amt(lux_array[11]) * (255-temp_array[0]) * onOff_array[11] /100 );     //11Low
-        }
-        if (i == 12){
-          analogWrite(23, dim_amt(lux_array[12]) *     temp_array[1]   * onOff_array[12] /100 );     //12High
-          analogWrite(21, dim_amt(lux_array[12]) * (255-temp_array[1]) * onOff_array[12] /100 );     //12Low
-        }   
-        Serial.println("I am brightening in the 11-12 main loop");
-      }
-    }
-    if(lt_array[i+2] == 1){   // like increasing the temp slider
-      Serial.print("lt_array[i]=1 and i is:");
-      Serial.println(i);     
-      if (temp_array[i-11] >= 0 && temp_array[i-11] < 255) {
-        temp_array[i-11] += 5;
-        if (temp_array[i-11] >= 255) {temp_array[i-11] = 255;}
-        if (i == 11) {
-          analogWrite(32, dim_amt(lux_array[11]) *     temp_array[0]   * onOff_array[11] /100 );     //11High
-          analogWrite(33, dim_amt(lux_array[11]) * (255-temp_array[0]) * onOff_array[11] /100 );     //11Low
-        }
-        if (i == 12){
-          analogWrite(23, dim_amt(lux_array[12]) *     temp_array[1]   * onOff_array[12] /100 );     //12High
-          analogWrite(21, dim_amt(lux_array[12]) * (255-temp_array[1]) * onOff_array[12] /100 );     //12Low
-        }    
-        Serial.println("I am heating in the 11-12 main loop");
-      }
-    }
-    if(lt_array[i+2] == -1){  // like decreasing the temp slider
-      Serial.print("lt_array [i]=-1 and i is:");
-      Serial.println(i);
-      
-      if (temp_array[i-11] > 0 && temp_array[i-11] <= 255) {
-        temp_array[i-11] -= 5;
-        if (temp_array[i-11] <= 0) {temp_array[i-11] = 0;}
-        if (i == 11) {
-          analogWrite(32, dim_amt(lux_array[11]) *     temp_array[0]   * onOff_array[11] /100 );     //11High
-          analogWrite(33, dim_amt(lux_array[11]) * (255-temp_array[0]) * onOff_array[11] /100 );     //11Low
-        }
-        if (i == 12){
-          analogWrite(23, dim_amt(lux_array[12]) *     temp_array[1]   * onOff_array[12] /100 );     //12High
-          analogWrite(21, dim_amt(lux_array[12]) * (255-temp_array[1]) * onOff_array[12] /100 );     //12Low
-        } 
-        
-        Serial.println("I am cooling in the 11-12 main loop");
-      }
-    }
-  }
-  */
-
   delay(50);
 }

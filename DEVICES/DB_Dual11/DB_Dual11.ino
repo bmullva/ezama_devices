@@ -12,9 +12,9 @@ int dim_amt (int dim) {
 
 
 //VIRTUAL:
-//lux 1-100
-//onOff 0, 1
-//temp 0-255
+//device_id/onOffN: should accept: anything, "on", "off"
+//device_id/luxN: should accept: 1-100
+//device_id/temp: should accept: 0-255
 // onOff_array: onOff 0, 1: {NA, 1, 2, 3, 4};
 // lux_array:  lux 0-100 {NA, lux1, lux2, lux3, lux4};
 // temp_array:  {temp1, temp2, temp3, temp4};
@@ -48,10 +48,6 @@ void publish_reporting_json() {
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
   client.publish(topic.c_str(), sj);
-  Serial.print("Returning State json: ");
-  Serial.print(topic);
-  Serial.println(sj);
-  
 }
 
 
@@ -63,19 +59,25 @@ void publish_reporting_json() {
 void receive_controls_json(String topic, String msg) {
   
   //VIRTUAL MSGS: 
-  // anything goes to device_id/onOffN, 1 ("click")
-  // numbers go to device device_id/luxN, 5-100
-  // device_id/tempN 0-255
+  //device_id/onOffN: should accept: anything, "on", "off"
+  //device_id/luxN: should accept: 5-100
+  //device_id/tempN: should accept: 0-255
 
   for (int i = 1; i<=2; i++) {        
     if (topic == String(device_id) + "/" + String("onOff") + String(i)) {
       onOff_array[i] = 1-onOff_array[i];  // any msg will switch between 1 and 0
+      if (msg == "on") {
+        onOff_array[i] = 1;
+      } 
+      if (msg == "off") {
+        onOff_array[i] = 0;    
+      }
     }
   }
 
   for (int i = 1; i<=2; i++) {        
     if (topic == String(device_id) + "/" + "lux" + String(i)) {
-      lux_array[i] = msg.toInt();  // msg to this topic should be value between 0-100
+      lux_array[i] = msg.toInt();  // msg to this topic should be value between 5-100
     }
   }
     
@@ -153,9 +155,6 @@ void specific_connect() {
   for (int i = 1; i <= 2; i++) {
     topic = String(device_id) + "/" + String("onOff") + String(i);
     client.subscribe(topic.c_str());
-    if (!client.subscribe(topic.c_str())) {
-        Serial.println("Failed to subscribe to topic: " + topic);
-    }
   }
 
   for (int i = 1; i<=2; i++) {        
@@ -168,7 +167,7 @@ void specific_connect() {
 }
 
 void setup() { 
-  Serial.begin(115200);
+  //Serial.begin(115200);
   ezama_setup();  //in ezama.h
   
   //pinMode(A0, INPUT);

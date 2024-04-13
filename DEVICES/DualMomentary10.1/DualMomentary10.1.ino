@@ -36,9 +36,6 @@ void publish_reporting_json() {
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
   client.publish(topic.c_str(), sj);
-  Serial.print("Returning State json: ");
-  Serial.print(topic);
-  Serial.println(sj);
 }
 
 

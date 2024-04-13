@@ -7,31 +7,16 @@ String ver = "11";
 
 int d_pin_reading [1]         = {HIGH};
 int d_pin_n1_reading [1]      = {HIGH};
-//unsigned long startMillis [1] = {0};
-//int clk [1]                   = {0};
-//int rel [1]                   = {0};
 
 
 //VIRTUAL:
-//lux 1-100
-//onOff 0, 1
-//temp 0-255
-// onOff_array: onOff 0, 1: {NA, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, AC1, AC2, AC3};
-// lux_array:  lux 0-100 {NA, lux1, lux2, lux3, lux4, lux5, lux6, lux7, lux8, lux9, lux10, lux11, lux12};
-// temp_array:  {temp11, temp12};
+//device_id/AConOffN: should accept: anything, "on", "off"
+// onOff_array: onOff 0, 1: {AC0, AC1};
 
 int onOff_array[]  = {0, 0};
-//int onOff_array[]  = {-99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-//int lux_array[]    = {-99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-//int temp_array[]   = {0, 0};
- 
 
 //PHYSICAL:
-//device_id/N N=1-12: should accept: "hold", "click", "click-hold", "dbl-click", "release"
-//device_id/N N=13,14 should accept "click", "on", "off", "dim", "brighten", "heat", "cool"
-// +1 -1 or 0: lt_array:  NA, lm1, lm2, lm3, lm4, lm5, lm6, lm7, lm8, lm9, lm10, lm11Lux, lm12Lux, lm11Temp, lm12Temp
-//int lt_array []    = {-99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-//int mom_pin_array[]= {-99,13,4,14,16,27,17,26,18,25,19};
+//device_id/ACN: should accept: anything, "on", "off"
 
 
 
@@ -61,22 +46,45 @@ void publish_reporting_json() {
 
 // 4 RECEIVE CONTROLS (to this exact device, from callback)
 void receive_controls_json(String topic, String msg) {
-  //these are for the "NAC" topics from a physical switch.
+
+  //VIRTUAL MSGS: 
+  //device_id/AConOffN: should accept: anything, "on", "off"
+
   for (int i = 0; i<=1; i++) {        
-    if (topic == String(device_id) + "/" + String("AConOff") + String(i)) {
-        onOff_array[i] = 1-onOff_array[i];  // any msg will switch between 1 and 0
+    if (topic == String(device_id) + "/" + "AConOff" + String(i)) {
+      onOff_array[i] = 1-onOff_array[i];  // any msg will switch between 1 and 0
+      if (msg == "on") {
+        onOff_array[i] = 1;
+      }
+      if (msg == "off") {
+        onOff_array[i] = 0;    
+      }
     }
-    digitalWrite(i, onOff_array[i]);   // ACi
   }
+
+  //PHYSICAL MESSAGES
+  //device_id/ACN: should accept: anything, "on", "off"
+  
+  for (int i = 0; i<=1; i++) {        
+    if (topic == String(device_id) + "/" + String("AC") + String(i)) {
+      onOff_array[i] = 1-onOff_array[i];  // any msg will switch between 1 and 0g
+      if (msg == "on") {
+        onOff_array[i] = 1;
+      } 
+      if (msg == "off") {
+        onOff_array[i] = 0;    
+      }
+    }
+  }
+
+    digitalWrite(0, onOff_array[0]);   // AC0
+    digitalWrite(1, onOff_array[1]);   // AC1
 }
 
 
 // 5 PUBLISH AND SEND CONTROLS (publish_controls only if controller module)
 void publish_controls_json(String pin_name, String pin_msg) {
-  for (int i = 0; i<=1; i++) {  
-    String topic = String(device_id) + "/" + String(i);
-    client.publish(topic.c_str(), pin_msg.c_str());
-  }
+
 }
 
 
@@ -99,10 +107,10 @@ void setup() {
   pinMode(0, OUTPUT);     //AC0
   pinMode(1, OUTPUT);     //AC1
   digitalWrite(0, HIGH);
-  digitalWrite(1, HIGH);  //AC1
+  digitalWrite(1, HIGH);  
   delay(2000);
   digitalWrite(0, LOW);
-  digitalWrite(1, LOW);   //AC1
+  digitalWrite(1, LOW);  
   specific_connect();
 }
 
