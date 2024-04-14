@@ -3,7 +3,7 @@
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Dual DB";
+String type_ = "DB Dual";
 String ver = "11";
 
 int dim_amt (int dim) {

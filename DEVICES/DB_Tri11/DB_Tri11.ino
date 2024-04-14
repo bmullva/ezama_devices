@@ -3,7 +3,7 @@
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Tri DB";
+String type_ = "DB Tri";
 String ver = "11";
 
 //const char* a_pin_name = "amps";

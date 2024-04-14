@@ -2,7 +2,7 @@
 //#include <Filters.h>
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "AC DB";
+String type_ = "DB AC";
 String ver = "11";
 
 int d_pin_reading [1]         = {HIGH};

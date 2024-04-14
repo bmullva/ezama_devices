@@ -3,7 +3,7 @@
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Light Hub";
+String type_ = "34V Light Hub";
 String ver = "11";
 
 //const char* a_pin_name = "amps";
@@ -69,6 +69,12 @@ void receive_controls_json(String topic, String msg) {
   for (int i = 1; i<=4; i++) {        
     if (topic == String(device_id) + "/" + String("onOff") + String(i)) {
       onOff_array[i] = 1-onOff_array[i];  // any msg will switch between 1 and 0
+      if (msg == "on") {
+        onOff_array[i] = 1;
+      } 
+      if (msg == "off") {
+        onOff_array[i] = 0;    
+      }
     }
   }
 
@@ -90,8 +96,13 @@ void receive_controls_json(String topic, String msg) {
 
   for (int i = 1; i<=4; i++) {        
     if (topic == String(device_id) + "/" + String(i)) {
-        // msg to these topics should be "on", "off", "dim", "brighten", "heat", "cool", "release"
+        // msg to these topics should be "click", "on", "off", "dim", "brighten", "heat", "cool", "release"
                
+        if (msg == "click") {
+          onOff_array[i] = 1 - onOff_array[i];
+          if (onOff_array[i] == 0) {lux_array[i] = 0;} // resets to max lum after turning off
+        }
+        
         if (msg == "on") {
           onOff_array[i] = 1;
         }
@@ -124,7 +135,7 @@ void receive_controls_json(String topic, String msg) {
   }
 
 
-  //NAC DOES NOT EXIST on this Light Hub
+  //Take action from Virtual Links.  Physical Links handled in Main Loop.
 
   analogWrite(25, dim_amt(lux_array[1]) *     temp_array[1]   * onOff_array[1] /100 );    //1High
   analogWrite(33, dim_amt(lux_array[1]) * (255-temp_array[1]) * onOff_array[1] /100 );    //1Low
@@ -138,7 +149,7 @@ void receive_controls_json(String topic, String msg) {
 }
 
 
-// 5 SEND CONTROLS SEND CONTROLS (publish_controls only if controller module)
+// 5 SSEND CONTROLS (publish_controls only if controller module)
 void publish_controls_json(String pin_name, String pin_msg) {
 
 }
