@@ -3,7 +3,7 @@
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "34V LH";
+String type_ = "Light Hub 34V";
 String ver = "11.0";
 
 //const char* a_pin_name = "amps";

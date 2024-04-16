@@ -3,7 +3,7 @@
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type_ = "DB AC";
-String ver = "11";
+String ver = "11.0";
 
 int d_pin_reading [1]         = {HIGH};
 int d_pin_n1_reading [1]      = {HIGH};
