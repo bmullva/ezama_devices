@@ -62,7 +62,12 @@ void publish_reporting_json() {
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
   client.publish(topic.c_str(), sj);
+
+  topic = String(device_id)+"/amp";  
+  client.publish(topic.c_str(), String(amp).c_str());
+
 }
+
 
 
 // 3 REPORT ID: "mqtt_pub -h XXX.XXX.XXX.XXX -m ids -t broadcast"
@@ -273,6 +278,7 @@ void specific_connect() {
 void setup() { 
   //Serial.begin(115200);
   ezama_setup();  //in ezama.h
+  specific_connect();
   int temp_AC_pins[] = {33, 32, 21, 23, 22, 2, 12};
   
   //pinMode(A0, INPUT);
@@ -296,8 +302,6 @@ void setup() {
   for (int i = 0; i<=6; i++) { 
     digitalWrite(temp_AC_pins[i], LOW);    //Low temp, High temp, and AC pins
   }
-  
-  specific_connect();
 }
 
 

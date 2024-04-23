@@ -1,11 +1,12 @@
 #include <Ezama2.h>
-
+//This is a 5V sensor that sensor 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type = "Water Flow Sensor(0.5in_1to30Lpm)";
+String type = "Water Flow 0.5in - 30Lpm";
 String ver = "8.0";
 
-float liters {};
+float lpm {};
+float gpm {};
 volatile int pulses = 0;    // count pulses
 void ICACHE_RAM_ATTR isr() { // ISR to increment count variable when pin goes high
   pulses++;
@@ -98,9 +99,8 @@ void loop() {
   // Liters = Q * time elapsed (seconds) / 60 (seconds/minute)
   // Liters = (Frequency (Pulses/second) / 7.5) * time elapsed (seconds) / 60
   // Liters = Pulses / (7.5 * 60)
-  liters = pulses;
-  liters /= 7.5;
-  liters /= 60.0;
+  lpm = pulses * (1/7.5) * (1/60.0);
+  gal = liters * 0.264172;
   
   delay(1000);
   
