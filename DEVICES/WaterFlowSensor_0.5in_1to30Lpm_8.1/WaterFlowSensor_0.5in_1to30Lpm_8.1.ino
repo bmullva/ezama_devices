@@ -1,6 +1,6 @@
 #include <Ezama11.h>  // For ESP-32 DOIT ESP23
 #include <Filters.h>
-//Flow sensor is a 5V device, and is to P14 
+//Flow sensor is a 5V device, and returns a 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type_ = "Water Flow 0.5in - 30Lpm";
