@@ -1,5 +1,5 @@
-#include <Ezama10_1.h>  // For ESP-32 DOIT ESP23
-#include <Filters.h>
+#include <Ezama11.h>  // For ESP-32 DOIT ESP23
+//#include <Filters.h>
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
@@ -75,6 +75,12 @@ void receive_controls_json(String topic, String msg) {
   for (int i = 1; i<=12; i++) {        
     if (topic == String(device_id) + "/" + String("onOff") + String(i)) {
       onOff_array[i] = 1-onOff_array[i];  // any msg will switch between 1 and 0
+      if (msg == "on") {
+        onOff_array[i] = 1;
+      } 
+      if (msg == "off") {
+        onOff_array[i] = 0;    
+      }
     }
   }
 
@@ -118,6 +124,22 @@ void receive_controls_json(String topic, String msg) {
         
         if (msg == "dbl-click") {
           
+        }
+
+        if (msg == "on") {
+          onOff_array[i] = 1;
+        }
+        
+        if (msg == "off") {
+          onOff_array[i] = 0;    
+        }
+
+        if (msg == "dim") {
+          lt_array[i] = 1;
+        }
+
+        if (msg == "brighten") {
+          lt_array[i] = -1;
         }
 
         if (msg == "release") {
