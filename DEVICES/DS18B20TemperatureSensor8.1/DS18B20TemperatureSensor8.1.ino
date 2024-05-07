@@ -10,7 +10,8 @@ String ver = "8.1";
 #define ONE_WIRE_BUS 14
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
-float t;
+float tempC;
+float tempF;
 
 
 
@@ -88,6 +89,7 @@ void loop() {
   ezama_loop();  //in ezama.h
   
   sensors.requestTemperatures(); // Send the command to get temperatures
-  t = sensors.getTempCByIndex(0);
+  tempC = sensors.getTempCByIndex(0);
+  tempF = sensors.getTempFByIndex(0);
   delay(1000);
 }
