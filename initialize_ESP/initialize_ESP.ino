@@ -6,7 +6,7 @@
 String type = "Initial";
 String ver = "11.0";
 int addr = 222;
-char id[] = "0000000D";
+char id[] = "000000XX";
 
 
 // 2 REPORT (SENT EVERY 6 SECONDS)
