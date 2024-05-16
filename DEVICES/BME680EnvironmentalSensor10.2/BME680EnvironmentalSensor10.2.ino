@@ -1,4 +1,4 @@
-#include <Ezama11.h>
+#include <Ezama12.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BME680.h"

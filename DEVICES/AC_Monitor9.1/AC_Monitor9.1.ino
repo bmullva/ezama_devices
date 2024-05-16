@@ -1,4 +1,4 @@
-#include <Ezama11.h>  // For ESP8266  ACS712-30A:66mv/A,ACS712-20A:100mv/A,ACS712-5A:185mv/A,
+#include <Ezama12.h>  // For ESP8266  ACS712-30A:66mv/A,ACS712-20A:100mv/A,ACS712-5A:185mv/A,
 // This device reports current readings and can also interrupt power.
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES

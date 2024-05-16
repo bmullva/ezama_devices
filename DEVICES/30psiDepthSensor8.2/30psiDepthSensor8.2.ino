@@ -1,4 +1,4 @@
-#include <Ezama11.h>  // For ESP-32 DOIT ESP23
+#include <Ezama12.h>  // For ESP-32 DOIT ESP23
 //Warning!  This device returns up to a 5V analog signal.  Voltage divider probably wanted.
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES

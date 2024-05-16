@@ -1,18 +1,13 @@
-#include <Ezama11.h>  // For ESP-32 DOIT ESP23
+#include <Ezama12.h>  // For ESP8266
 #include <Filters.h>
-//Flow sensor is a 5V device, and returns a 
+//Motion sensor is a 5V device, and returns a 3.3V Signal
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Water Flow 0.5in - 30Lpm";
-String ver = "8.1";
+String type_ = "RCWL-0516 Motion Sensor";
+String ver = "8.0";
 
-float lpm {};
-float gpm {};
-volatile int pulses = 0;    // count pulses
-void ICACHE_RAM_ATTR isr() { // ISR to increment count variable when pin goes high
-  pulses++;
-}
-
+String onOff {};
+String topic {};
 
 // 2 REPORT (SENT EVERY 6 SECONDS)
 void publish_reporting_json() {
@@ -24,17 +19,13 @@ void publish_reporting_json() {
   state_json["type"]      = type_;
   state_json["ver"]       = ver;
   state_json["IP"]        = WiFi.localIP();
-  state_json["vG"]        = "gpm,0,30";
+  //state_json["vG"]        = "depth,0,20";
   //state_json["vL"]        = "1,12,onOff;1,12,lux;11,12,temp;1,3,AConOff";
   //state_json["pL"]        = "1,12,;1,3,AC";
-  //state_json["pS"]        = "1,4,onOff";
+  state_json["pS"]        = "0,0,onOff";
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
   client.publish(topic.c_str(), sj);
-  
-  topic = String(device_id)+"/gpm";  
-  client.publish(topic.c_str(), String(gpm).c_str());
-
 
 }
 
@@ -59,9 +50,8 @@ void publish_controls_json(String pin_name, String pin_msg) {
 
 //6 SETUP (pins)
 void specific_connect() {
-  String topic {};
-  
-  topic = String(device_id)+"/"+String("gpm");
+
+  topic = String(device_id)+"/"+String("onOff");
   client.subscribe(topic.c_str());
 
 }
@@ -71,8 +61,7 @@ void setup() {
   ezama_setup();  //in ezama.h
   specific_connect();
   
-  pinMode(14, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(14), isr, RISING); // Attach ISR to pin's rising edge interrupt
+  pinMode(14, INPUT);
 }
 
 
@@ -80,15 +69,16 @@ void setup() {
 
 void loop() {
   ezama_loop();  //in ezama.h
+ 
+  if (digitalRead(14) == HIGH && onOff == "off") {        
+    onOff = "on";
+    client.publish(topic.c_str(), String(onOff).c_str()); 
+  }
 
-  
-  // plastic sensor: use following calculation
-  // Sensor Frequency (Hz) = 7.5 * Q (Liters/min)
-  // Liters = Q * time elapsed (seconds) / 60 (seconds/minute)
-  // Liters = (Frequency (Pulses/second) / 7.5) * time elapsed (seconds) / 60
-  // Liters = Pulses / (7.5 * 60)
-  lpm = pulses * (1/7.5) * (1/60.0);
-  gpm = lpm * 0.264172;
+  if (digitalRead(14) == LOW && onOff == "on") {        
+    onOff = "off";
+    client.publish(topic.c_str(), String(onOff).c_str());
+  }
   
   delay(1000);
 }

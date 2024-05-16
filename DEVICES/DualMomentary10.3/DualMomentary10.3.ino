@@ -1,15 +1,16 @@
-#include <Ezama11.h>
+#include <Ezama12.h> // For WEMOS D1 R2 & mini
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Dual Momentary";
-String ver = "10.1";
+String type_ = "Dual Momentary D1Mini";
+String ver = "10.3";
 
 int d_pin_reading [4]         = {HIGH, HIGH, HIGH, HIGH};
 int d_pin_n1_reading [4]      = {HIGH, HIGH, HIGH, HIGH};
 unsigned long startMillis [4] = {0, 0, 0, 0};
 int clk [4]                   = {0, 0, 0, 0};
 int rel [4]                   = {0, 0, 0, 0};
+int mom_pins [4] = {4, 5, 12, 14};
 
 // Define enums for different states
 enum ButtonState {
@@ -66,10 +67,10 @@ void specific_connect() {
 void setup() { 
   ezama_setup();  //in ezama8.h
   
-  pinMode(0, INPUT_PULLUP);
-  pinMode(1, INPUT_PULLUP);
-  pinMode(2, INPUT_PULLUP);
-  pinMode(3, INPUT_PULLUP);
+  pinMode(4, INPUT_PULLUP);
+  pinMode(5, INPUT_PULLUP);
+  pinMode(12, INPUT_PULLUP);
+  pinMode(14, INPUT_PULLUP);
 
 }
 
@@ -82,7 +83,7 @@ void loop() {
   
   // Loop through an array of digital pins, read their states, and store the readings
   for(int i = 0; i < sizeof(d_pin_reading) / sizeof(d_pin_reading[0]); i++) {
-    d_pin_reading[i] = digitalRead(i);
+    d_pin_reading[i] = digitalRead(mom_pins[i]);
   }
 
   // Loop through a set of conditions for each of 4 pins

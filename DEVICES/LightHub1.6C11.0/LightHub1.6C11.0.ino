@@ -3,18 +3,19 @@
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Light Hub";
+String type_ = "Light Hub 1.6C";
 String ver = "11.0";
 
 float voltage_array[] = {-99,0};
 float current_array[] = {-99,0};
 int input_pins[] = {36};
-unsigned long previousMillis = 0;
-const long interval = 20000; // interval in milliseconds
-float sum_sqrd_current_array[] = {0};
+//unsigned long previousMillis = 0;
+//const long interval = 20000; // interval in milliseconds
+//float sum_sqrd_current_array[] = {0};
 //float max_current_array[] = {0,0,0,0,0,0};
-float rms_current_array[] = {0};
+//float rms_current_array[] = {0};
 //float max_current_over_root_2_array[] = {0,0,0,0,0,0};
+float amp {};
 
 int dim_amt (int dim) {
   return 100 - dim;
@@ -286,7 +287,7 @@ void setup() {
   //Serial.begin(115200);
   ezama_setup();  //in ezama.h
   specific_connect();
-  int temp_AC_pins[] = {33, 21, 22, 32, 23, 2};
+  //int temp_AC_pins[] = {33, 21, 22, 32, 23, 2};
   
   //pinMode(A0, INPUT);
  
@@ -313,46 +314,24 @@ void setup() {
 
 
 
-void take_readings() {
-  for (int i = 0; i<=0; i++) {
-    voltage_array[i] = analogRead(input_pins[i]) * 3.3 / 4096.0;
-    current_array[i] = (voltage_array[i] -1.5) / 0.066;
-    sum_sqrd_current_array[i] += current_array[i] * current_array[i];
+//void take_readings() {
+//  for (int i = 0; i<=0; i++) {
+//    voltage_array[i] = analogRead(input_pins[i]) * 3.3 / 4096.0;
+//    current_array[i] += (voltage_array[i] -1.5) / 0.066;
+//    sum_sqrd_current_array[i] += current_array[i] * current_array[i];
     //max_current_array[i] = max(max_current_array[i], current_array[i]);
-    delay(2);  
-  }
-}
+//    delay(2);  
+//  }
+//}
+
 //7 MAIN LOOP
 // -1,0,+1 to manage the analog writing in the lt_array: lm11Lux, lm12Lux, lm11Temp, lm12Temp
 
 void loop() {
   ezama_loop();  //in ezama.h
 
-  String topic {};
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
-    for (int i = 0; i<=0; i++) {
-      sum_sqrd_current_array[i] = 0;
-      max_current_array[i] = 0;
-      rms_current_array[i] = 0;
-      max_current_over_root_2_array[i] = 0; 
-    }
-    for (int i = 0; i < 500; i++) {
-      take_readings();
-    }
-    for (int i = 0; i<=0; i++) {
-      //rms_current_array[i] = max(sqrt(sum_sqrd_current_array[i]/500.0), max_current/sqrt(2));
-      rms_current_array[i] = sqrt((1/500.0) * sum_sqrd_current_array[i]);
-      //max_current_over_root_2_array[i] = max_current_array[i] / sqrt(2.0);
-    }
-    for (int i = 0; i<=0; i++) {
-      topic = String(device_id)+"/amp" + String(i);  
-      client.publish(topic.c_str(), String(rms_current_array[i]).c_str());
-      //topic = String(device_id)+"/ampx" + String(i);  
-      //client.publish(topic.c_str(), String(max_current_over_root_2_array[i]).c_str());
-    }
-  }
+  float voltage = analogRead(input_pins[0]) * 3.3 / 4096.0;
+  amp = (voltage -1.5) / 0.066;
 
   for(int i=1;i<=10;i++) {
     if(lt_array[i] == 1 && lux_array[i] < 99){   // like increasing the dim slider

@@ -1,9 +1,9 @@
-#include <Ezama11.h>  // For ESP-32 DOIT ESP23
+#include <Ezama12.h>  // For ESP01S
 //DO LIGHT FIRST, THEN TOGGLE
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type_ = "AC Switchbox";
-String ver = "10.1";
+String ver = "10.2";
 
 int d_pin_reading [1]         = {HIGH};
 int d_pin_n1_reading [1]      = {HIGH};
