@@ -3,7 +3,7 @@
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Light Hub";
+String type_ = "Light Hub Pro";
 String ver = "11.0";
 
 float voltage_array[] = {-99,0,0,0,0,0};

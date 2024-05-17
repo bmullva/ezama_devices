@@ -6,16 +6,10 @@
 String type_ = "Light Hub 1.6C";
 String ver = "11.0";
 
-float voltage_array[] = {-99,0};
-float current_array[] = {-99,0};
 int input_pins[] = {36};
-//unsigned long previousMillis = 0;
-//const long interval = 20000; // interval in milliseconds
-//float sum_sqrd_current_array[] = {0};
-//float max_current_array[] = {0,0,0,0,0,0};
-//float rms_current_array[] = {0};
-//float max_current_over_root_2_array[] = {0,0,0,0,0,0};
 float amp {};
+float voltage {};
+// The code needs to be updated to 1.5V for 3V power.
 
 int dim_amt (int dim) {
   return 100 - dim;
@@ -73,6 +67,9 @@ void publish_reporting_json() {
 
   topic = String(device_id)+"/amp";  
   client.publish(topic.c_str(), String(amp).c_str());
+
+  topic = String(device_id)+"/voltage";  
+  client.publish(topic.c_str(), String(voltage).c_str());
 
 }
 
@@ -226,8 +223,8 @@ void receive_controls_json(String topic, String msg) {
   //  }
   //}
 
-  //Take action from non-sweeping commands, both virtual and physical.
-  //Sweeping commands are handled in the main loop.
+  //Take action from non-"sweeping" commands, both virtual and physical.
+  //"Sweeping" commands are handled in the main loop.
   for (int i = 1; i<=10; i++) {
     analogWrite(mom_pin_array[i], dim_amt(lux_array[i]) * 255 * onOff_array[i] /100 );
   }
@@ -287,9 +284,7 @@ void setup() {
   //Serial.begin(115200);
   ezama_setup();  //in ezama.h
   specific_connect();
-  //int temp_AC_pins[] = {33, 21, 22, 32, 23, 2};
-  
-  //pinMode(A0, INPUT);
+  pinMode(36, INPUT);
  
   for (int i = 1; i<=10; i++) { 
     digitalWrite(mom_pin_array[i], OUTPUT);    //01-10
@@ -313,25 +308,13 @@ void setup() {
 }
 
 
-
-//void take_readings() {
-//  for (int i = 0; i<=0; i++) {
-//    voltage_array[i] = analogRead(input_pins[i]) * 3.3 / 4096.0;
-//    current_array[i] += (voltage_array[i] -1.5) / 0.066;
-//    sum_sqrd_current_array[i] += current_array[i] * current_array[i];
-    //max_current_array[i] = max(max_current_array[i], current_array[i]);
-//    delay(2);  
-//  }
-//}
-
 //7 MAIN LOOP
 // -1,0,+1 to manage the analog writing in the lt_array: lm11Lux, lm12Lux, lm11Temp, lm12Temp
 
 void loop() {
   ezama_loop();  //in ezama.h
-
-  float voltage = analogRead(input_pins[0]) * 3.3 / 4096.0;
-  amp = (voltage -1.5) / 0.066;
+  voltage = analogRead(input_pins[0]) * 3.3 / 4096.0;
+  amp = (voltage -1.55) / 0.066;
 
   for(int i=1;i<=10;i++) {
     if(lt_array[i] == 1 && lux_array[i] < 99){   // like increasing the dim slider
