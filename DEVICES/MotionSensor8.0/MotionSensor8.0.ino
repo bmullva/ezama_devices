@@ -1,4 +1,4 @@
-#include <Ezama12.h>  // For ESP8266
+#include <Ezama12.h>  // For D1 R2 & mini
 #include <Filters.h>
 //Motion sensor is a 5V device, and returns a 3.3V Signal
 
@@ -6,7 +6,7 @@
 String type_ = "RCWL-0516 Motion Sensor";
 String ver = "8.0";
 
-String onOff {};
+String onOff = "off";
 String topic {};
 
 // 2 REPORT (SENT EVERY 6 SECONDS)
@@ -51,7 +51,7 @@ void publish_controls_json(String pin_name, String pin_msg) {
 //6 SETUP (pins)
 void specific_connect() {
 
-  topic = String(device_id)+"/"+String("onOff");
+  topic = String(device_id)+"/"+String("onOff0");
   client.subscribe(topic.c_str());
 
 }
@@ -61,7 +61,7 @@ void setup() {
   ezama_setup();  //in ezama.h
   specific_connect();
   
-  pinMode(14, INPUT);
+  pinMode(12, INPUT);
 }
 
 
@@ -70,15 +70,15 @@ void setup() {
 void loop() {
   ezama_loop();  //in ezama.h
  
-  if (digitalRead(14) == HIGH && onOff == "off") {        
+  if (digitalRead(12) == HIGH && onOff == "off") {        
     onOff = "on";
     client.publish(topic.c_str(), String(onOff).c_str()); 
   }
 
-  if (digitalRead(14) == LOW && onOff == "on") {        
+  if (digitalRead(12) == LOW && onOff == "on") {        
     onOff = "off";
     client.publish(topic.c_str(), String(onOff).c_str());
   }
-  
+
   delay(1000);
 }

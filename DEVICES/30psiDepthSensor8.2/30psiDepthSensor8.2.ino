@@ -1,4 +1,4 @@
-#include <Ezama12.h>  // For ESP-32 DOIT ESP23
+#include <Ezama12.h>  // For D1 R2 & mini
 //Warning!  This device returns up to a 5V analog signal.  Voltage divider probably wanted.
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
@@ -42,6 +42,9 @@ void publish_reporting_json() {
 
   topic = String(device_id)+"/depth";  
   client.publish(topic.c_str(), String(depth).c_str());
+
+  topic = String(device_id)+"/aPin";  
+  client.publish(topic.c_str(), String(a_pin_reading).c_str());
 
 }
 

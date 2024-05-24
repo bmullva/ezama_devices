@@ -4,7 +4,7 @@
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type_ = "Water Flow 0.5in - 30Lpm";
-String ver = "8.1";
+String ver = "8.2";
 
 float lpm {};
 float gpm {};
@@ -24,7 +24,7 @@ void publish_reporting_json() {
   state_json["type"]      = type_;
   state_json["ver"]       = ver;
   state_json["IP"]        = WiFi.localIP();
-  state_json["vG"]        = "gpm,0,30";
+  state_json["vG"]        = "gpm,0,30; lpm,0,120";
   //state_json["vL"]        = "1,12,onOff;1,12,lux;11,12,temp;1,3,AConOff";
   //state_json["pL"]        = "1,12,;1,3,AC";
   //state_json["pS"]        = "1,4,onOff";
@@ -62,6 +62,9 @@ void specific_connect() {
   String topic {};
   
   topic = String(device_id)+"/"+String("gpm");
+  client.subscribe(topic.c_str());
+
+  topic = String(device_id)+"/"+String("lpm");
   client.subscribe(topic.c_str());
 
 }
