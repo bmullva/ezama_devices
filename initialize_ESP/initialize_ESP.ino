@@ -1,4 +1,4 @@
-#include <Ezama11.h>
+#include <Ezama12X.h>
 
 
 //https://www.ezama.tech/ez/ard/esp_number?increment=True 
@@ -6,7 +6,7 @@
 String type = "Initial";
 String ver = "11.0";
 int addr = 222;
-char id[] = "000000XX";
+char id[] = "00000061";
 
 
 // 2 REPORT (SENT EVERY 6 SECONDS)
