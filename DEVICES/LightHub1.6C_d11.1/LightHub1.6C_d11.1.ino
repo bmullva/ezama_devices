@@ -317,7 +317,7 @@ void setup() {
 void loop() {
   ezama_loop();  //in ezama.h
   voltage = analogRead(input_pins[0]) * 3.3 / 4096.0;
-  amp = (voltage -1.55) / 0.066;
+  amp = (voltage -1.5) / 0.066;
 
   //for(int i=1;i<=10;i++) {
   //  if(lt_array[i] == 1 && lux_array[i] < 99){   // like increasing the dim slider

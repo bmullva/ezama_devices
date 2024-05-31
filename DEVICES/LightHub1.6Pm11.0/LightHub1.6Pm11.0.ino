@@ -3,39 +3,32 @@
 #include <Wire.h>
 #include <ArduinoJson.h>
 
-void setup() {
-  Wire.begin();
-  Serial.begin(115200);
-}
-
-void loop() {
-  String topic = "temperature";
-  String message = "25C";
-
-  StaticJsonDocument,200> doc
-  doc["topic"] = topic;
-  doc["message"] = message;
-
-  Wire.beginTransmission(8);
-  serializeJson(doc, Wire);
-  Wire.endTransmission();
-  delay(5000);
-}
-
-
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type_ = "Light Hub Pro";
 String ver = "11.0";
 
-float voltage_array[] = {-99,0,0,0,0,0};
-float current_array[] = {-99,0,0,0,0,0};
-int input_pins[] = {36, 39, 34, 35, 15, 12};
-unsigned long previousMillis = 0;
-const long interval = 20000; // interval in milliseconds
-float sum_sqrd_current_array[] = {0,0,0,0,0,0};
-//float max_current_array[] = {0,0,0,0,0,0};
-float rms_current_array[] = {0,0,0,0,0,0};
-//float max_current_over_root_2_array[] = {0,0,0,0,0,0};
+//float voltage_array[] = {-99,0,0,0,0,0};
+//float current_array[] = {-99,0,0,0,0,0};
+//int input_pins[] = {36, 39, 34, 35, 15, 12};
+//unsigned long previousMillis = 0;
+//const long interval = 20000; // interval in milliseconds
+//float sum_sqrd_current_array[] = {0,0,0,0,0,0};
+//float rms_current_array[] = {0,0,0,0,0,0};
+
+const int windowSize = 500; // Window size of 500
+const int numPins = 5; // Number of pins to read (A1 to A5)
+int input_pins[numPins] = {39, 34, 35, 15, 12}; // Define your input pins
+float voltage_array[numPins] = {0}; // Store voltage readings
+float current_array[numPins] = {0}; // Store current readings
+float sum_sqrd_current_array[numPins] = {0}; // Store sum of squared current readings
+float currentBuffer[numPins][windowSize] = {0}; // Buffer to store current readings for rolling window
+int bufferIndex[numPins] = {0}; // Index to keep track of the position in the buffer
+float sumSquaredCurrent[numPins] = {0}; // Variable to store the sum of squared currents in the window
+float rms_current_array[numPins] = {0};
+float inverseWindowSize = 1.0f / float(windowSize);
+float dc_voltage {};
+float dc_amp {};
+
 
 int dim_amt (int dim) {
   return 100 - dim;
@@ -91,20 +84,12 @@ void publish_reporting_json() {
   client.publish(topic.c_str(), sj);
 
   topic = String(device_id)+"/amp0";  
-  client.publish(topic.c_str(), String(amp0).c_str());
-  topic = String(device_id)+"/amp1";  
-  client.publish(topic.c_str(), String(amp1).c_str());
-  topic = String(device_id)+"/amp2";  
-  client.publish(topic.c_str(), String(amp2).c_str());
-  topic = String(device_id)+"/amp3";  
-  client.publish(topic.c_str(), String(amp3).c_str());
-  topic = String(device_id)+"/amp4";  
-  client.publish(topic.c_str(), String(amp4).c_str());
-  topic = String(device_id)+"/amp5";  
-  client.publish(topic.c_str(), String(amp5).c_str());
+  client.publish(topic.c_str(), String(dc_amp).c_str());
+  for (int i = 0; i<numPins; i++) {
+    topic = String(device_id)+"/amp" + String(i+1);  
+    client.publish(topic.c_str(), String(rms_current_array[i]).c_str());
+  }
 }
-
-
 
 // 3 REPORT ID: "mqtt_pub -h XXX.XXX.XXX.XXX -m ids -t broadcast"
 // Reserved
@@ -123,7 +108,7 @@ void receive_controls_json(String topic, String msg) {
      || (topic.substring(topic.indexOf('/') + 1).indexOf("14") != -1)
      || (topic.substring(topic.indexOf('/') + 1).indexOf("15") != -1)
      || (topic.substring(topic.indexOf('/') + 1).indexOf("16") != -1)
-     || (topic.substring(topic.indexOf('/') + 1).indexOf("AC") != -1) {
+     || (topic.substring(topic.indexOf('/') + 1).indexOf("AC") != -1)) {
       StaticJsonDocument<200> doc;
       doc["topic"] = topic;
       doc["message"] = msg;
@@ -359,48 +344,34 @@ void setup() {
 }
 
 
-
-void take_readings() {
-  for (int i = 0; i<=5; i++) {
-    voltage_array[i] = analogRead(input_pins[i]) * 3.3 / 4096.0;
-    current_array[i] = (voltage_array[i] -1.5) / 0.066;
-    sum_sqrd_current_array[i] += current_array[i] * current_array[i];
-    //max_current_array[i] = max(max_current_array[i], current_array[i]);
-    delay(2);  
-  }
-}
 //7 MAIN LOOP
 // -1,0,+1 to manage the analog writing in the lt_array: lm11Lux, lm12Lux, lm11Temp, lm12Temp
 void loop() {
   ezama_loop();  //in ezama.h
 
-  String topic {};
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
-    for (int i = 0; i<=5; i++) {
-      sum_sqrd_current_array[i] = 0;
-      max_current_array[i] = 0;
-      rms_current_array[i] = 0;
-      max_current_over_root_2_array[i] = 0; 
-    }
-    for (int i = 0; i < 500; i++) {
-      take_readings();
-    }
-    for (int i = 0; i<=5; i++) {
-      //rms_current_array[i] = max(sqrt(sum_sqrd_current_array[i]/500.0), max_current/sqrt(2));
-      rms_current_array[i] = sqrt((1/500.0) * sum_sqrd_current_array[i]);
-      //max_current_over_root_2_array[i] = max_current_array[i] / sqrt(2.0);
-    }
-    for (int i = 0; i<=5; i++) {
-      topic = String(device_id)+"/amp" + String(i);  
-      client.publish(topic.c_str(), String(rms_current_array[i]).c_str());
-      //topic = String(device_id)+"/ampx" + String(i);  
-      //client.publish(topic.c_str(), String(max_current_over_root_2_array[i]).c_str());
-    }
-  }
+  for (int pin = 0; pin < numPins; pin++) {
+        // Read the analog input and calculate voltage and current
+        float voltage = analogRead(input_pins[pin]) * 3.3 / 4096.0;
+        float current = (voltage - 2.5) / 0.066;
+        float squaredCurrent = current * current;
 
+        // Update the rolling sum of squared currents
+        sumSquaredCurrent[pin] -= currentBuffer[pin][bufferIndex[pin]]; // Subtract the oldest value
+        currentBuffer[pin][bufferIndex[pin]] = squaredCurrent; // Store the new squared current in the buffer
+        sumSquaredCurrent[pin] += squaredCurrent; // Add the new value to the sum
 
+        // Update the index to point to the next position in the buffer
+        bufferIndex[pin] = (bufferIndex[pin] + 1) % windowSize;
+
+        // Store the new values in the arrays
+        voltage_array[pin] = voltage;
+        current_array[pin] = current;
+        sum_sqrd_current_array[pin] = sumSquaredCurrent[pin];
+        rms_current_array[pin] = sqrt(inverseWindowSize * sum_sqrd_current_array[pin]);
+    }
+
+  dc_voltage = analogRead(36) * 3.3 / 4096.0;
+  dc_amp = (dc_voltage -2.5) / 0.066;
   
   for(int i=1;i<=10;i++) {
     if(lt_array[i] == 1 && lux_array[i] < 99){   // like increasing the dim slider
