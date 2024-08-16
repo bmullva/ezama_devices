@@ -3,6 +3,7 @@
 #define I2C_ADDRESS 0x40
 
 // Connect the INA226 sensor to the ESP32 according to the wiring diagram below.
+// https://github.com/izzarzn/QuantumVolt
 // SDA -> ESP32 SDA
 // SCL -> ESP32 SCL
 // VCC -> 3.3V
