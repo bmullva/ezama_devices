@@ -1,9 +1,9 @@
-#include <Ezama12.h>  // For D1Mini
+#include <Ezama12X.h>  // For D1Mini
 //DO LIGHT FIRST, THEN TOGGLE
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type_ = "AC Switchbox D1Mini";
-String ver = "10.3";
+String ver = "10.4";
 
 int d_pin_reading [1]         = {HIGH};
 int d_pin_n1_reading [1]      = {HIGH};
