@@ -1,4 +1,4 @@
-#include <Ezama12X.h>  // For D1Mini
+#include <Ezama12.h>  // For D1Mini
 //DO LIGHT FIRST, THEN TOGGLE
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES

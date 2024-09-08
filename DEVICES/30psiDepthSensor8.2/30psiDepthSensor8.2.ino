@@ -70,9 +70,6 @@ void publish_controls_json(String pin_name, String pin_msg) {
 void specific_connect() {
   String topic {};
   
-  topic = String(device_id)+"/"+String("depth");
-  client.subscribe(topic.c_str());
-  
 }
 
 void setup() { 

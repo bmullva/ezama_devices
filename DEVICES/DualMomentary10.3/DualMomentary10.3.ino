@@ -65,6 +65,9 @@ void specific_connect() {
 }
 
 void setup() { 
+  long randomDelay = random(0, 10001);
+  delay(randomDelay);
+  
   ezama_setup();  //in ezama8.h
   
   pinMode(4, INPUT_PULLUP);

@@ -1,4 +1,4 @@
-#include <Ezama12.h>  // For ESP8266, D1 R2 & Mini
+#include <Ezama12.h>  // For ESP8266, D1 R2 & Mini Red-5V, Blk-GND, Grn-P14, Wht-A0 (Unused)
 #include <OneWire.h>
 #include <DallasTemperature.h>
 //This is a 5V device, and returns 5V digital signal.
