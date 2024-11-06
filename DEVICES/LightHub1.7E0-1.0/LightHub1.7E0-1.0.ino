@@ -3,10 +3,9 @@
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Light Hub 1.7E";
+String type_ = "Light Hub 1.7E0";
 String ver = "1.0";
 
-int input_pins[] = {36};
 float amp {};
 float voltage {};
 // The code needs to be updated to 1.5V for 3V power.
@@ -39,8 +38,8 @@ int mom_pin_array[]= {-99,13,4,14,16,27,17,26,18,25,19,33,23};
 
 
 //PHYSICAL:
-//device_id/N N=1-10: should accept: "hold", "click", "click-hold", "dbl-click", "release"
-//device_id/N N=11,12 should accept "click", "on", "off", "dim", "brighten", "heat", "cool"
+//device_id/N N=1-12: should accept: "hold", "click", "click-hold", "dbl-click", "release"
+//device_id/N N= none should accept "click", "on", "off", "dim", "brighten", "heat", "cool"
 //device_id/ACN: should accept: anything, "on", "off"
 // +1 -1 or 0: lt_array:  NA,lm1,lm2,lm3,lm4,lm5,lm6,lm7,lm8,lm9,lm10,lm11,lm12
 int lt_array []    = {-99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -77,7 +76,6 @@ void receive_controls_json(String topic, String msg) {
   
   //VIRTUAL MSGS: 
   //device_id/onOffN: should accept: anything, "on", "off"
-  //device_id/AConOffN: should accept: anything, "on", "off"
   //device_id/luxN: should accept: 0-95
   //device_id/tempN: should accept: 0-255
 
@@ -191,19 +189,6 @@ void receive_controls_json(String topic, String msg) {
   //  }
   //}
 
-  //device_id/ACN: should accept: anything, "on", "off"  
-  //for (int i = 1; i<=3; i++) {        
-  //  if (topic == String(device_id) + "/" + String("AC") + String(i)) {
-  //    onOff_array[i+12] = 1-onOff_array[i+12];  // any msg will switch between 1 and 0g
-  //    if (msg == "on") {
-  //      onOff_array[i] = 1;
-  //    } 
-  //    if (msg == "off") {
-  //      onOff_array[i] = 0;    
-  //    }
-  //  }
-  //}
-
   //Take action from non-"sweeping" commands, both virtual and physical.
   //"Sweeping" commands are handled in the main loop.
   for (int i = 1; i<=12; i++) {
@@ -213,11 +198,6 @@ void receive_controls_json(String topic, String msg) {
   //for (int i = 11; i<=13; i++) {
   //  t_write(i);
   //}
-
-  //digitalWrite(22, onOff_array[13]);   // AC1
-  //digitalWrite(2,  onOff_array[14]);   // AC2
-  //digitalWrite(12, onOff_array[15]);   // AC3
-  
 }
 
 
@@ -248,14 +228,6 @@ void specific_connect() {
   //for (int i = 11; i<=13; i++) {        
   //  client.subscribe((String(device_id)+"/"+String("temp")+String(i)).c_str());
   //  }
-    
-  //for (int i = 1; i<=3; i++) {        
-  //  client.subscribe((String(device_id)+"/"+String("AConOff")+String(i)).c_str());
-  //  }
-
-  //for (int i = 1; i<=3; i++) {        
-  //  client.subscribe((String(device_id)+"/"+String("AC")+String(i)).c_str());
-  //  }
 }
 
 void setup() { 
@@ -269,8 +241,8 @@ void setup() {
   }
   
   //for (int i = 0; i<=6; i++) { 
-  //  digitalWrite(temp_AC_pins[i], OUTPUT);  //Low temp, High temp, and AC pins
-  //  digitalWrite(temp_AC_pins[i], HIGH);
+  //  digitalWrite(low_pins[i], OUTPUT);  //Low temp, High temp
+  //  digitalWrite(high_pins[i], HIGH);
   //} 
   
   delay(2000);

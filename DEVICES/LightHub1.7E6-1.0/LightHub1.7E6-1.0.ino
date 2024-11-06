@@ -3,7 +3,7 @@
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Light Hub 1.7E (dual)";
+String type_ = "Light Hub 1.7E6";
 String ver = "1.0";
 
 int input_pins[] = {36};
@@ -57,7 +57,7 @@ void publish_reporting_json() {
   state_json["type"]      = type_;
   state_json["ver"]       = ver;
   state_json["IP"]        = WiFi.localIP();
-  state_json["vG"]        = "amp,0,20";
+  //state_json["vG"]        = "amp,0,20";
   state_json["vL"]        = "1,6,onOff;1,6,lux;1,6,temp";
   state_json["pL"]        = "1,6,";
   //state_json["pS"]        = "1,4,onOff";
@@ -77,7 +77,6 @@ void receive_controls_json(String topic, String msg) {
   
   //VIRTUAL MSGS: 
   //device_id/onOffN: should accept: anything, "on", "off"
-  //device_id/AConOffN: should accept: anything, "on", "off"
   //device_id/luxN: should accept: 0-95
   //device_id/tempN: should accept: 0-255
 
@@ -93,17 +92,6 @@ void receive_controls_json(String topic, String msg) {
     }
   }
 
-  //for (int i = 1; i<=3; i++) {        
-  //  if (topic == String(device_id) + "/" + "AConOff" + String(i)) {
-  //    onOff_array[i+12] = 1-onOff_array[i+12];  // any msg will switch between 1 and 0
-  //    if (msg == "on") {
-  //      onOff_array[i] = 1;
-  //    }
-  //    if (msg == "off") {
-  //      onOff_array[i] = 0;    
-  //    }
-  //  }
-  //}
   
   for (int i = 1; i<=6; i++) {        
     if (topic == String(device_id) + "/" + "lux" + String(i)) {
@@ -203,19 +191,6 @@ void receive_controls_json(String topic, String msg) {
     }
   }
 
-  //device_id/ACN: should accept: anything, "on", "off"  
-  //for (int i = 1; i<=3; i++) {        
-  //  if (topic == String(device_id) + "/" + String("AC") + String(i)) {
-  //    onOff_array[i+12] = 1-onOff_array[i+12];  // any msg will switch between 1 and 0g
-  //    if (msg == "on") {
-  //      onOff_array[i] = 1;
-  //    } 
-  //    if (msg == "off") {
-  //      onOff_array[i] = 0;    
-  //    }
-  //  }
-  //}
-
   //Take action from non-"sweeping" commands, both virtual and physical.
   //"Sweeping" commands are handled in the main loop.
   //for (int i = 1; i<=10; i++) {
@@ -225,11 +200,6 @@ void receive_controls_json(String topic, String msg) {
   for (int i = 1; i<=6; i++) {
     t_write(i);
   }
-
-  //digitalWrite(22, onOff_array[13]);   // AC1
-  //digitalWrite(2,  onOff_array[14]);   // AC2
-  //digitalWrite(12, onOff_array[15]);   // AC3
-  
 }
 
 
@@ -260,21 +230,12 @@ void specific_connect() {
   for (int i = 1; i<=6; i++) {        
     client.subscribe((String(device_id)+"/"+String("temp")+String(i)).c_str());
     }
-    
-  //for (int i = 1; i<=3; i++) {        
-  //  client.subscribe((String(device_id)+"/"+String("AConOff")+String(i)).c_str());
-  //  }
-
-  //for (int i = 1; i<=3; i++) {        
-  //  client.subscribe((String(device_id)+"/"+String("AC")+String(i)).c_str());
-  //  }
 }
 
 void setup() { 
   //Serial.begin(115200);
   ezama_setup();  //in ezama.h
   specific_connect();
-  pinMode(36, INPUT);
  
   //for (int i = 1; i<=10; i++) { 
   //  digitalWrite(mom_pin_array[i], OUTPUT);    //01-10
