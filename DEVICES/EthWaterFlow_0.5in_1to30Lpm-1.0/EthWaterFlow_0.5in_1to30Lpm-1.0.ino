@@ -27,7 +27,7 @@ const int password_addr = 240; // 8-63 byte (240-302)
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type_ = "Water Flow 0.5in - 30Lpm";
-String ver = "8.3";
+String ver = "1.0";
 
 float lpm = 0;
 float gpm = 0;

@@ -25,8 +25,8 @@ const int password_addr = 240; // 8-63 byte (240-302)
 
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Sub Depth Sensor";
-String ver = "8.1";
+String type_ = "Ethernet Depth";
+String ver = "1.0";
 
 int a_pin_reading {};  
 float v {};
