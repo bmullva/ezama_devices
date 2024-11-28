@@ -1,34 +1,15 @@
-#include <ETH.h>          //For ESP32 Dev Module
+#include <ETH.h>          //For WT32-ETH01
 #include <WiFiClient.h>
 #include <PubSubClient.h>
 #include <EEPROM.h>
 #include <ArduinoJson.h>
-#include "PinDefinitionsAndMore.h"
-#include <IRremote.hpp> // include the library
-
-//MAYBE OTA?
-
-// 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "POE Momentary";
-String ver = "10.3";
-
-#define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
-#define ETH_POWER_PIN   -1
-#define ETH_TYPE        ETH_PHY_LAN8720
-#define ETH_ADDR        1
-#define ETH_MDC_PIN     23
-#define ETH_MDIO_PIN    18
-#define LED_PIN         2
-
 WiFiClient ethClient;
 PubSubClient mqttClient(ethClient);
-
-//const char* mqtt_server = "192.168.4.222";
 const char* mqtt_server {};
 char mqtt_ip_1[] = "192.168.0.222";
 char mqtt_ip_2[] = "192.168.1.222";
 char mqtt_ip_3[] = "192.168.4.222";
-char device_id[9] {};
+char device_id[9] = {};
 const int mqtt_port = 1883;
 const char* mqtt_topic_subscribe = "broadcast";
 const char* mqtt_topic_publish = "reporting";
@@ -38,6 +19,13 @@ static bool eth_connected = false;
 const int password_length_addr = 231; // 8 <= len <= 63
 // 232-239 NOT USED
 const int password_addr = 240; // 8-63 byte (240-302)
+
+#include "PinDefinitionsAndMore.h"
+#include <IRremote.hpp> // include the library
+
+// 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
+String type_ = "Ethernet IR";
+String ver = "1.0";
 
 int d_pin_reading [4]         = {HIGH, HIGH, HIGH, HIGH};
 int d_pin_n1_reading [4]      = {HIGH, HIGH, HIGH, HIGH};
@@ -52,106 +40,6 @@ enum ButtonState {
   ON
 };
 ButtonState timer[4]          = {OFF, OFF, OFF, OFF};
-
-//Need to install the following:
-
-
-void WiFiEvent(WiFiEvent_t event) {
-  switch (event) {
-    case ARDUINO_EVENT_ETH_START:
-      Serial.println("ETH Started");
-      ETH.setHostname("esp32-ethernet");
-      break;
-    case ARDUINO_EVENT_ETH_CONNECTED:
-      Serial.println("ETH Connected");
-      break;
-    case ARDUINO_EVENT_ETH_GOT_IP:
-      Serial.print("ETH MAC: ");
-      Serial.print(ETH.macAddress());
-      Serial.print(", IPv4: ");
-      Serial.print(ETH.localIP());
-      if (ETH.fullDuplex()) {
-        Serial.print(", FULL_DUPLEX");
-      }
-      Serial.print(", ");
-      Serial.print(ETH.linkSpeed());
-      Serial.println("Mbps");
-      eth_connected = true;
-      mqttClient.setServer(mqtt_server, mqtt_port);
-      mqttClient.setCallback(mqttCallback);
-      break;
-    case ARDUINO_EVENT_ETH_DISCONNECTED:
-      Serial.println("ETH Disconnected");
-      eth_connected = false;
-      break;
-    case ARDUINO_EVENT_ETH_STOP:
-      Serial.println("ETH Stopped");
-      eth_connected = false;
-      break;
-    default:
-      break;
-  }
-}
-
-void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived on topic: ");
-  Serial.print(topic);
-  Serial.print(". Message: ");
-  String messageTemp;
-  for (int i = 0; i < length; i++) {
-    messageTemp += (char)payload[i];
-  }
-  Serial.println(messageTemp);
-  if (strcmp(topic, "broadcast") == 0) {
-    if (messageTemp == "ping") {publish_reporting_json();}
-    if (messageTemp == "restart") { 
-      delay(10000);  // Delay before restarting
-      ESP.restart();
-    }
-  }
-  else if (strcmp(topic, device_id) == 0) {
-    if (messageTemp == "restart") {ESP.restart();}
-    if (messageTemp == "reset") {
-      for (int i = 0; i < 222; i++) {EEPROM.write(i, 255);}
-      for (int i = 231; i < 512; i++) {EEPROM.write(i, 255);}
-      EEPROM.write(230, 's');
-      EEPROM.commit();
-      ESP.restart();
-    }
-  }
-  else if (strcmp(topic, "password") == 0) {
-    int password_length = messageTemp.length();
-    if (password_length > 0 && password_length <= 64) {  // Ensure password is within bounds
-      EEPROM.write(password_length_addr, password_length);
-      for (int i = 0; i < password_length; i++) {
-        EEPROM.write(password_addr + i, messageTemp[i]);
-      }
-      EEPROM.commit();
-      ESP.restart();
-    }
-    else {
-      Serial.println("Invalid password length.");
-    }
-  }
-  else {
-    receive_controls_json(topic, messageTemp);
-  }
-}
-
-void reconnect() {
-  while (!mqttClient.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    if (mqttClient.connect("ESP32Client")) {
-      Serial.println("connected");
-      mqttClient.subscribe(mqtt_topic_subscribe);
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(mqttClient.state());
-      Serial.println(" try again in 5 seconds");
-      delay(5000);
-    }
-  }
-}
 
 
 //MAYBE? OTA?
@@ -196,54 +84,15 @@ void publish_controls(String switch_num, String pin_msg) {
 void specific_connect() {
 }
 
-void findMQTTserver() {
-  mqttClient.setServer(mqtt_ip_1, mqtt_port);
-  Serial.print("I have tried mqtt1");
-  if (mqttClient.connect(device_id)) {
-    mqtt_server = mqtt_ip_1;
-    return;  // Connected successfully
-  }
-  mqttClient.setServer(mqtt_ip_2, mqtt_port);
-  Serial.print("I have tried mqtt2");
-  if (mqttClient.connect(device_id)) {
-    mqtt_server = mqtt_ip_2;
-    return;  // Connected successfully
-  }
-  mqttClient.setServer(mqtt_ip_3, mqtt_port);
-  Serial.print("I have tried mqtt3");
-  if (mqttClient.connect(device_id)) {
-    mqtt_server = mqtt_ip_3;
-    Serial.print("I have connected to the MQTT client");
-    return;  // Connected successfully
-  }
-}
 
 void setup() {
-  long randomDelay = random(0, 10001);
-  delay(randomDelay);
-  
-  //pinMode(4, INPUT_PULLUP);
-  //pinMode(5, INPUT_PULLUP);
-  //pinMode(12, INPUT_PULLUP);
-  //pinMode(14, INPUT_PULLUP);
-  //pinMode(LED_PIN, OUTPUT);
+  ezama_setup();  //in ezama.ino
   Serial.begin(115200);
   
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
   Serial.print(F("Ready to receive IR signals of protocols: "));
   printActiveIRProtocols(&Serial);
   Serial.println(F("at pin " STR(IR_RECEIVE_PIN)));
-
-  EEPROM.begin(512);
-  for (int i = 0; i < 8; i++) {
-    device_id[i] = char(EEPROM.read(222 + i));
-    }
-  Serial.println("ESP32-Stick begin\n");
-  WiFi.onEvent(WiFiEvent);
-  Serial.printf("%d\n\r", ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE, ETH_CLK_MODE));
-  findMQTTserver();
-  mqttClient.subscribe(mqtt_topic_subscribe);
-  //mqttClient.setServer(mqtt_server, mqtt_port);
 }
 
 
@@ -254,10 +103,7 @@ void setup() {
 //const long interval = 5000; // 5 seconds
 
 void loop() {
-  if (!mqttClient.connected()) {
-      reconnect();
-  }
-  mqttClient.loop();
+  ezama_loop();  //in ezama.ino
   
   if (eth_connected && IrReceiver.decode()) {
     if (!IrReceiver.decodedIRData.flags & IRDATA_FLAGS_IS_REPEAT) {

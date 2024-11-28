@@ -1,5 +1,28 @@
-#include <Ezama12.h>  // For D1 R2 & mini
+#include <ETH.h>          //For WT32-ETH01
+#include <WiFiClient.h>
+#include <PubSubClient.h>
+#include <EEPROM.h>
+#include <ArduinoJson.h>
+//#include <Wire.h>
+WiFiClient ethClient;
+PubSubClient mqttClient(ethClient);
+const char* mqtt_server {};
+char mqtt_ip_1[] = "192.168.0.222";
+char mqtt_ip_2[] = "192.168.1.222";
+char mqtt_ip_3[] = "192.168.4.222";
+char device_id[9] = {};
+const int mqtt_port = 1883;
+const char* mqtt_topic_subscribe = "broadcast";
+const char* mqtt_topic_publish = "reporting";
+static bool eth_connected = false;
+//const int device_id_addr = 222; 
+//8 digit (222-229) device_id
+const int password_length_addr = 231; // 8 <= len <= 63
+// 232-239 NOT USED
+const int password_addr = 240; // 8-63 byte (240-302)
 //Warning!  This device returns up to 10V analog.  Voltage divider & 10 ft max depth.
+
+
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type_ = "Sub Depth Sensor";
@@ -26,13 +49,13 @@ void publish_reporting_json() {
   //state_json["pS"]        = "1,4,onOff";
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
-  client.publish(topic.c_str(), sj);
+  mqttClient.publish(topic.c_str(), sj);
 
   topic = String(device_id)+"/depth";  
-  client.publish(topic.c_str(), String(depth).c_str());
+  mqttClient.publish(topic.c_str(), String(depth).c_str());
 
   topic = String(device_id)+"/voltage";  
-  client.publish(topic.c_str(), String(v).c_str());
+  mqttClient.publish(topic.c_str(), String(v).c_str());
 
 }
 

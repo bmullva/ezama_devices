@@ -1,4 +1,26 @@
-#include <Ezama12.h> // NodeMCU 1.0
+#include <ETH.h>          //For WT32-ETH01
+#include <WiFiClient.h>
+#include <PubSubClient.h>
+#include <EEPROM.h>
+#include <ArduinoJson.h>
+WiFiClient ethClient;
+PubSubClient mqttClient(ethClient);
+const char* mqtt_server {};
+char mqtt_ip_1[] = "192.168.0.222";
+char mqtt_ip_2[] = "192.168.1.222";
+char mqtt_ip_3[] = "192.168.4.222";
+char device_id[9] = {};
+const int mqtt_port = 1883;
+const char* mqtt_topic_subscribe = "broadcast";
+const char* mqtt_topic_publish = "reporting";
+static bool eth_connected = false;
+//const int device_id_addr = 222; 
+//8 digit (222-229) device_id
+const int password_length_addr = 231; // 8 <= len <= 63
+// 232-239 NOT USED
+const int password_addr = 240; // 8-63 byte (240-302)
+
+
 const double dVCC = 3.3;             // NodeMCU on board 3.3v vcc
 const double dR2 = 10000;            // 10k ohm series resistor
 const double dAdcResolution = 1023;  // 10-bit adc
@@ -31,13 +53,13 @@ void publish_reporting_json() {
   state_json["pS"]        = "1,1,";
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
-  client.publish(topic.c_str(), sj);
+  mqttClient.publish(topic.c_str(), sj);
 
   topic = String(device_id)+"/tempF";  
-  client.publish(topic.c_str(), String(dTemperature).c_str());
+  mqttClient.publish(topic.c_str(), String(dTemperature).c_str());
 
   topic = String(device_id)+"/setpoint";  
-  client.publish(topic.c_str(), String(setpoint).c_str());
+  mqttClient.publish(topic.c_str(), String(setpoint).c_str());
   
 }
 
@@ -62,7 +84,7 @@ void receive_controls_json(String topic, String msg) {
 // No controls to be sent.
 void publish_controls_json(String pin_name, String pin_msg) {
   String topic = String(device_id) + "/1";
-  client.publish(topic.c_str(), pin_msg.c_str());
+  mqttClient.publish(topic.c_str(), pin_msg.c_str());
 }
 
 
@@ -75,7 +97,7 @@ void setup() {
   Serial.begin(115200);
   EEPROM.begin(512);
   ezama_setup();  //in ezama8.h
-  client.subscribe((String(device_id) + String("/set_temp1")).c_str());
+  mqttClient.subscribe((String(device_id) + String("/set_temp1")).c_str());
   setpoint = EEPROM.read(220);
 }
 

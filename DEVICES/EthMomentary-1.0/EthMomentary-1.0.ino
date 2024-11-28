@@ -1,16 +1,35 @@
-#include <Ezama12.h> // For WEMOS D1 R2 & mini
-
+#include <ETH.h>          //For WT32-ETH01
+#include <WiFiClient.h>
+#include <PubSubClient.h>
+#include <EEPROM.h>
+#include <ArduinoJson.h>
+WiFiClient ethClient;
+PubSubClient mqttClient(ethClient);
+const char* mqtt_server {};
+char mqtt_ip_1[] = "192.168.0.222";
+char mqtt_ip_2[] = "192.168.1.222";
+char mqtt_ip_3[] = "192.168.4.222";
+char device_id[9] = {};
+const int mqtt_port = 1883;
+const char* mqtt_topic_subscribe = "broadcast";
+const char* mqtt_topic_publish = "reporting";
+static bool eth_connected = false;
+//const int device_id_addr = 222; 
+//8 digit (222-229) device_id
+const int password_length_addr = 231; // 8 <= len <= 63
+// 232-239 NOT USED
+const int password_addr = 240; // 8-63 byte (240-302)
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Dual Momentary D1Mini";
-String ver = "10.3";
+String type_ = "Ethernet Momentary";
+String ver = "1.0";
 
 int d_pin_reading [4]         = {HIGH, HIGH, HIGH, HIGH};
 int d_pin_n1_reading [4]      = {HIGH, HIGH, HIGH, HIGH};
 unsigned long startMillis [4] = {0, 0, 0, 0};
 int clk [4]                   = {0, 0, 0, 0};
 int rel [4]                   = {0, 0, 0, 0};
-int mom_pins [4] = {4, 5, 12, 14};
+int mom_pins [4] = {4, 13, 12, 14};
 
 // Define enums for different states
 enum ButtonState {
@@ -29,16 +48,15 @@ void publish_reporting_json() {
   state_json["device_id"] = device_id;
   state_json["type"] = type_;
   state_json["ver"] = ver;
-  state_json["IP"] = WiFi.localIP();
+  state_json["IP"] = ETH.localIP();
   //state_json["vG"]        = "amp,0,20";
   //state_json["vL"]        = "1,4,onOff;1,4,lux;1,4,temp";
   //state_json["pL"]        = "1,4,";
   state_json["pS"]= "0,1,";
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
-  client.publish(topic.c_str(), sj);
+  mqttClient.publish(topic.c_str(), sj);
 }
-
 
 // 3 REPORT ID: "mqtt_pub -h XXX.XXX.XXX.XXX -m ids -t broadcast"
 //Reserve
@@ -49,41 +67,42 @@ void receive_controls_json(String topic, String messageTemp) {
   if(messageTemp == "restart") {ESP.restart();}
 }
 
-
 // 5 SEND CONTROLS SEND CONTROLS (publish_controls only if controller module)
 // Only these will be published: "on", "off", "dim", "brighten", "heat", "cool"
 
 void publish_controls(String switch_num, String pin_msg) {
   String topic = String(device_id) + "/" + switch_num;
-  client.publish(topic.c_str(), pin_msg.c_str());
+  mqttClient.publish(topic.c_str(), pin_msg.c_str());
 }
 
 
 //6 SETUP (pins)
 void specific_connect() {
-  
 }
 
-void setup() { 
-  long randomDelay = random(0, 10001);
-  delay(randomDelay);
-  
-  ezama_setup();  //in ezama8.h
+void setup() {
+  ezama_setup();  //in ezama.h
+  Serial.begin(115200);
   
   pinMode(4, INPUT_PULLUP);
-  pinMode(5, INPUT_PULLUP);
+  pinMode(13, INPUT_PULLUP);
   pinMode(12, INPUT_PULLUP);
   pinMode(14, INPUT_PULLUP);
-
 }
 
 
-//7 MAIN LOOP
+//7 MAIN LOOP#####
 // Only these will be published: "click", "on", "off", "dim", "brighten", "heat", "cool"
 
+//unsigned long previousMillis = 0;
+//const long interval = 5000; // 5 seconds
+
 void loop() {
-  ezama_loop();  // Call a function named ezama_loop from ezama.h
+  ezama_loop();
   
+  //Serial.println(eth_connected);
+  if (eth_connected) {
+
   // Loop through an array of digital pins, read their states, and store the readings
   for(int i = 0; i < sizeof(d_pin_reading) / sizeof(d_pin_reading[0]); i++) {
     d_pin_reading[i] = digitalRead(mom_pins[i]);
@@ -151,4 +170,6 @@ void loop() {
   }
 
   delay(100);
+    
+  }
 }

@@ -1,4 +1,26 @@
-#include <Ezama12.h>  // For ESP8266, D1 R2 & Mini Red-5V, Blk-GND, Grn-P14, Wht-A0 (Unused)
+#include <ETH.h>          //For WT32-ETH01
+#include <WiFiClient.h>
+#include <PubSubClient.h>
+#include <EEPROM.h>
+#include <ArduinoJson.h>
+WiFiClient ethClient;
+PubSubClient mqttClient(ethClient);
+const char* mqtt_server {};
+char mqtt_ip_1[] = "192.168.0.222";
+char mqtt_ip_2[] = "192.168.1.222";
+char mqtt_ip_3[] = "192.168.4.222";
+char device_id[9] = {};
+const int mqtt_port = 1883;
+const char* mqtt_topic_subscribe = "broadcast";
+const char* mqtt_topic_publish = "reporting";
+static bool eth_connected = false;
+//const int device_id_addr = 222; 
+//8 digit (222-229) device_id
+const int password_length_addr = 231; // 8 <= len <= 63
+// 232-239 NOT USED
+const int password_addr = 240; // 8-63 byte (240-302)
+
+
 #include <OneWire.h>
 #include <DallasTemperature.h>
 //This is a 5V device, and returns 5V digital signal.
@@ -31,13 +53,13 @@ void publish_reporting_json() {
   //state_json["pS"]        = "1,4,onOff";
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
-  client.publish(topic.c_str(), sj);
+  mqttClient.publish(topic.c_str(), sj);
 
   topic = String(device_id)+"/tempC";  
-  client.publish(topic.c_str(), String(tempC).c_str());
+  mqttClient.publish(topic.c_str(), String(tempC).c_str());
 
   topic = String(device_id)+"/tempF";  
-  client.publish(topic.c_str(), String(tempF).c_str());
+  mqttClient.publish(topic.c_str(), String(tempF).c_str());
 
 }
 
@@ -64,10 +86,10 @@ void specific_connect() {
   String topic {};
   
   topic = String(device_id)+"/"+String("tempC");
-  client.subscribe(topic.c_str());
+  mqttClient.subscribe(topic.c_str());
 
   topic = String(device_id)+"/"+String("tempF");
-  client.subscribe(topic.c_str());
+  mqttClient.subscribe(topic.c_str());
 
 }
 

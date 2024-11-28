@@ -1,5 +1,26 @@
-#include <Ezama12.h>  // For D1 R2 & mini
-#include <Filters.h>
+#include <ETH.h>          //For WT32-ETH01
+#include <WiFiClient.h>
+#include <PubSubClient.h>
+#include <EEPROM.h>
+#include <ArduinoJson.h>
+WiFiClient ethClient;
+PubSubClient mqttClient(ethClient);
+const char* mqtt_server {};
+char mqtt_ip_1[] = "192.168.0.222";
+char mqtt_ip_2[] = "192.168.1.222";
+char mqtt_ip_3[] = "192.168.4.222";
+char device_id[9] = {};
+const int mqtt_port = 1883;
+const char* mqtt_topic_subscribe = "broadcast";
+const char* mqtt_topic_publish = "reporting";
+static bool eth_connected = false;
+//const int device_id_addr = 222; 
+//8 digit (222-229) device_id
+const int password_length_addr = 231; // 8 <= len <= 63
+// 232-239 NOT USED
+const int password_addr = 240; // 8-63 byte (240-302)
+
+//#include <Filters.h>
 //Motion sensor is a 5V device, and returns a 3.3V Signal
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
@@ -25,7 +46,7 @@ void publish_reporting_json() {
   state_json["pS"]        = "0,0,onOff";
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
-  client.publish(topic.c_str(), sj);
+  mqttClient.publish(topic.c_str(), sj);
 
 }
 
@@ -52,7 +73,7 @@ void publish_controls_json(String pin_name, String pin_msg) {
 void specific_connect() {
 
   topic = String(device_id)+"/"+String("onOff0");
-  client.subscribe(topic.c_str());
+  mqttClient.subscribe(topic.c_str());
 
 }
 
@@ -72,12 +93,12 @@ void loop() {
  
   if (digitalRead(12) == HIGH && onOff == "off") {        
     onOff = "on";
-    client.publish(topic.c_str(), String(onOff).c_str()); 
+    mqttClient.publish(topic.c_str(), String(onOff).c_str()); 
   }
 
   if (digitalRead(12) == LOW && onOff == "on") {        
     onOff = "off";
-    client.publish(topic.c_str(), String(onOff).c_str());
+    mqttClient.publish(topic.c_str(), String(onOff).c_str());
   }
 
   delay(1000);
