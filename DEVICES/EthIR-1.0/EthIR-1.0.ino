@@ -23,23 +23,12 @@ const int password_addr = 240; // 8-63 byte (240-302)
 #include "PinDefinitionsAndMore.h"
 #include <IRremote.hpp> // include the library
 
+#define IR_RECEIVE_PIN 14 // connect to pin 14?
+
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type_ = "Ethernet IR";
 String ver = "1.0";
 
-int d_pin_reading [4]         = {HIGH, HIGH, HIGH, HIGH};
-int d_pin_n1_reading [4]      = {HIGH, HIGH, HIGH, HIGH};
-unsigned long startMillis [4] = {0, 0, 0, 0};
-int clk [4]                   = {0, 0, 0, 0};
-int rel [4]                   = {0, 0, 0, 0};
-int mom_pins [4] = {4, 5, 12, 14};
-
-// Define enums for different states
-enum ButtonState {
-  OFF,
-  ON
-};
-ButtonState timer[4]          = {OFF, OFF, OFF, OFF};
 
 
 //MAYBE? OTA?
