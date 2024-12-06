@@ -33,8 +33,8 @@ double dVout, dRth, dTemperature, dAdcValue;
 int setpoint {};
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Temp Cntrl";
-String ver = "10.3";
+String type_ = "Ethernet 10K NTC";
+String ver = "1.0";
 
 
 // 2 REPORT (SENT EVERY 6 SECONDS)

@@ -24,8 +24,8 @@ const int password_addr = 240; // 8-63 byte (240-302)
 //Motion sensor is a 5V device, and returns a 3.3V Signal
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "RCWL-0516 Motion Sensor";
-String ver = "8.0";
+String type_ = "Ethernet RCWL-0516 Motion";
+String ver = "1.0";
 
 String onOff = "off";
 String topic {};

@@ -25,7 +25,7 @@ const int password_addr = 240; // 8-63 byte (240-302)
 #include "Adafruit_BME680.h"
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "Eth BME680 Environ Sens";
+String type_ = "Ethernet BME680 Environmental";
 String ver = "1.0";
 
 Adafruit_BME680 bme;

@@ -26,8 +26,8 @@ const int password_addr = 240; // 8-63 byte (240-302)
 //This is a 5V device, and returns 5V digital signal.
 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
-String type_ = "DS18B20 Temperature Sensor";
-String ver = "8.1";
+String type_ = "Ethernet DS18B20 Temperature";
+String ver = "1.0";
 
 #define ONE_WIRE_BUS 14
 OneWire oneWire(ONE_WIRE_BUS);
