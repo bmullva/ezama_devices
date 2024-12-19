@@ -4,7 +4,6 @@
   #define RESET_PIN 32  // GPIO32 connected to MCP23017 reset
   bool mcpInitialized = false;
   String mcp_found {};
-  unsigned long lastAttempt = 0;
   
   String type_ = "Ethernet Light Hub";
   String ver = "2.0";
@@ -40,7 +39,6 @@ void initializeMCP() {
     if (millis() - lastAttempt > 5000) {
         if (mcp0.begin_I2C(0x20)) {
             mcpInitialized = true;
-            client.publish("debug", "MCP INITIALIZED");
         } else {
             resetMCP23017();
         }
@@ -49,7 +47,6 @@ void initializeMCP() {
 }
 
 void resetMCP23017() {
-    client.publish("debug", "TRYING TO RESET MCP");
     digitalWrite(RESET_PIN, LOW); 
     delay(10);                     
     digitalWrite(RESET_PIN, HIGH);
@@ -59,9 +56,20 @@ int dim_amt (int dim) {
   return 100 - dim;
 }
 
+void mcp0_analogWrite(int pin, int value) {
+  for (int i = 0; i < 255; i++) {
+    if (i < value) {
+      mcp0.digitalWrite(pin, HIGH);
+    } else {
+      mcp0.digitalWrite(pin, LOW);
+    }
+    delayMicroseconds(25);  // Adjust this value for desired PWM frequency
+  }
+}
+
 void t_write(int i) {
-  analogWrite(low_pins[i],  dim_amt(lux_array[i]) * (255-temp_array[i]) * onOff_array[i] /100 );  // Low
-  analogWrite(high_pins[i], dim_amt(lux_array[i]) *     temp_array[i]   * onOff_array[i] /100 );  // High  
+  mcp0_analogWrite(low_pins[i],  dim_amt(lux_array[i]) * (255-temp_array[i]) * onOff_array[i] /100 );  // Low
+  mcp0_analogWrite(high_pins[i], dim_amt(lux_array[i]) *     temp_array[i]   * onOff_array[i] /100 );  // High  
 }
 
 
@@ -212,7 +220,7 @@ void receive_controls_json(String topic, String msg) {
   for (int i = 1; i<=12; i++) {
     String debugMsg = String(mom_pin_array[i]) + ":" + String(dim_amt(lux_array[i]) * 255 * onOff_array[i] / 100);
     client.publish("debug", debugMsg.c_str());
-    analogWrite(mom_pin_array[i], dim_amt(lux_array[i]) * 255 * onOff_array[i] /100 );
+    mcp0_analogWrite(mom_pin_array[i], dim_amt(lux_array[i]) * 255 * onOff_array[i] /100 );
   }
   for (int i = 13; i<=14; i++) {
     t_write(i);
@@ -243,6 +251,7 @@ void specific_connect() {
     topic = String(device_id)+"/"+String(i);
     client.subscribe(topic.c_str());
   }
+  client.publish("reporting", "I have subscribed to the topics");
   client.publish("debug", "I have subscribed to the topics");
 }
 
@@ -252,15 +261,12 @@ void custom_setup() {
   pinMode(RESET_PIN, OUTPUT);
   digitalWrite(RESET_PIN, HIGH); // Keep reset high by default
   Wire.begin(MCP23017_SDA, MCP23017_SCL);
-  delay(1000);
   initializeMCP();
   if (mcpInitialized == false) {
     client.publish("debug", "MCP NOT INITIALIZED");
-    mcp_found = "Not Initialized";
   }
   else {
     client.publish("debug", "MCP INITIALIZED");
-    mcp_found = "Initialized";
   }
   mcp0.pinMode(0, OUTPUT);
   mcp0.pinMode(1, OUTPUT);
@@ -268,6 +274,8 @@ void custom_setup() {
   mcp0.pinMode(3, OUTPUT);
   mcp0.pinMode(4, OUTPUT);
   mcp0.pinMode(5, OUTPUT);
+  mcp0.pinMode(6, OUTPUT);
+  mcp0.pinMode(7, OUTPUT);
   mcp0.pinMode(8, OUTPUT);
   mcp0.pinMode(9, OUTPUT);
   mcp0.pinMode(10, OUTPUT);
@@ -288,11 +296,11 @@ void custom_loop() {
   for(int i=1;i<=12;i++) {
     if(lt_array[i] == 1 && lux_array[i] < 99){   // like increasing the dim slider
         lux_array[i] += 1;
-        analogWrite(mom_pin_array[i], dim_amt(lux_array[i]) * 255 * onOff_array[i] /100 );    
+        mcp0_analogWrite(mom_pin_array[i], dim_amt(lux_array[i]) * 255 * onOff_array[i] /100 );    
     }
     if(lt_array[i] == -1 && lux_array[i] > 0){  // like decreasing the dim slider
         lux_array[i] -= 1;
-        analogWrite(mom_pin_array[i], dim_amt(lux_array[i]) * 255 * onOff_array[i] /100 );
+        mcp0_analogWrite(mom_pin_array[i], dim_amt(lux_array[i]) * 255 * onOff_array[i] /100 );
     }
   }
   

@@ -178,7 +178,7 @@ void publish_reporting_json() {
 
 // 4 RECEIVE CONTROLS (to this exact device, from callback)
 void receive_controls_json(String topic, String messageTemp) {
-  if(messageTemp == "restart") {ESP.restart();}
+  
 }
 
 // 5 SEND CONTROLS SEND CONTROLS (publish_controls only if controller module)

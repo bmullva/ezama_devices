@@ -30,7 +30,7 @@ bool mcpInitialized = false; // Flag to check if MCP is initialized
 unsigned long lastMCPInitAttempt = 0;
 
 void setup() {
-    Serial.begin(115200); // For debugging, though you can't see it
+    Serial.begin(115200); // For debugging
 
     // Ethernet setup
     ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE, ETH_CLK_MODE);
@@ -59,9 +59,8 @@ void loop() {
     delay(1000);
     if (!mcpInitialized) {
         if (millis() - lastMCPInitAttempt > 5000) { // Try every 5 seconds if failed
-            if (mcp0.begin_I2C(0x20) || mcp4.begin_I2C(0x24)) {
+            if (mcp0.begin_I2C(0x24)) {
                 mcpInitialized = true;
-                //mcp0.pinMode(LED_PIN, OUTPUT); // Use pin 8 for testing
                 client.publish(mqtt_topic, "MCP23017 Initialized");
             } else {
                 client.publish(mqtt_topic, "MCP23017 Init Failed, Attempting Reset");
@@ -73,9 +72,38 @@ void loop() {
         // If MCP is initialized, proceed with normal operations
         String i2cStatus = scanI2C();
         client.publish(mqtt_topic, i2cStatus.c_str());
+
+        // Communicate with slaves
+        String slaveResponses = "";
+        communicateWithSlave(0x20, "Hello 20", slaveResponses);
+        communicateWithSlave(0x21, "Hello 21", slaveResponses);
+        communicateWithSlave(0x22, "Hello 22", slaveResponses);
+        communicateWithSlave(0x24, "Hello 24", slaveResponses);
+        
+        if (!slaveResponses.isEmpty()) {
+            client.publish(mqtt_topic, slaveResponses.c_str());
+        }
     }
 
     delay(3000); // Toggle every 3 seconds, adjust as needed
+}
+
+void communicateWithSlave(uint8_t address, const char* message, String& response) {
+    Wire.beginTransmission(address);
+    Wire.write(message);
+    Wire.endTransmission();
+    
+    delay(10); // Give slave some time to prepare response
+    
+    Wire.requestFrom(address, 32); // Request up to 32 bytes from slave
+    if(Wire.available()) {
+        response += "Slave 0x" + String(address, HEX) + ": " + Wire.readString() + "; ";
+    }
+}
+
+
+bool initializeMCPs() {
+    mcp4.begin_I2C(0x24);
 }
 
 void connectMQTT() {
@@ -104,12 +132,8 @@ String scanI2C() {
         error = Wire.endTransmission();
 
         if (error == 0) {
-            if (address == 0x20) { // MCP23017 address
-                result += "MCP@0x20 ";
-                nDevices++;
-            } else {
-                result += "Dev@0x" + String(address, HEX) + " ";
-            }
+            result += "Dev@0x" + String(address, HEX) + " ";
+            nDevices++;
         }
     }
 

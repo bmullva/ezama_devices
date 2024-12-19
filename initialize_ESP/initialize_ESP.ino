@@ -6,7 +6,7 @@
 String type = "Initial";
 String ver = "1.0";
 int addr = 222;
-char id[] = "00000070";
+char id[] = "00000073";
 
 
 // 2 REPORT (SENT EVERY 6 SECONDS)
@@ -64,8 +64,8 @@ void setup() {
 
   ezama_setup();
   
-  pinMode(LED_BUILTIN, OUTPUT); // Set the LED pin as an output
-  digitalWrite(LED_BUILTIN, HIGH); // Turn on the LED
+  //pinMode(LED_BUILTIN, OUTPUT); // Set the LED pin as an output
+  //digitalWrite(LED_BUILTIN, HIGH); // Turn on the LED
 }
 
 
