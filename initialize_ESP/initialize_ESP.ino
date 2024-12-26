@@ -1,12 +1,11 @@
 #include <Ezama12.h>
 
-
 //https://www.ezama.tech/ez/ard/esp_number?increment=True 
 // 1 INITIALIZE DEVICE PARTICULAR CONSTANTS & VARIABLES
 String type = "Initial";
 String ver = "1.0";
 int addr = 222;
-char id[] = "00000073";
+char id[] = "DELETEME";
 
 
 // 2 REPORT (SENT EVERY 6 SECONDS)
@@ -19,6 +18,7 @@ void publish_reporting_json() {
   state_json["type"] = type;
   state_json["ver"] = ver;
   state_json["IP"] = WiFi.localIP();
+  state_json["MAC"] = WiFi.macAddress();
   //state_json["pS"]= "0,3,";
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
