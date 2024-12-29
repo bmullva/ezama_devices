@@ -194,7 +194,7 @@ void publish_reporting_json() {
   //state_json["vG"]        = "amp,0,20";
   //state_json["vL"]        = "1,4,onOff;1,4,lux;1,4,temp";
   //state_json["pL"]        = "1,4,";
-  state_json["pS"]= "0,48,";
+  state_json["pS"]= "0,47,";
 
   serializeJson(state_json, output);
   client.publish("reporting", output.c_str());

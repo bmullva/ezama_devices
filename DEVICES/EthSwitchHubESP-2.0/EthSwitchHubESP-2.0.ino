@@ -2,7 +2,7 @@
 #include <esp_now.h>
 #include <esp_wifi.h>
 
-#define BOARD_NUMBER 3
+#define BOARD_NUMBER 4
 #define PJON_DATA_PIN 21
 uint8_t peerMacAddress[] = {0xA0, 0xB7, 0x65, 0x2D, 0x25, 0xD8};
 
@@ -12,7 +12,7 @@ unsigned long startMillis [20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int clk [20]                   = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int rel [20]                   = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 //int mom_pins [20] = {2,4,5,13,14,15,16,17,18,19,23,25,26,27,32,33,34,35,36,39};
-int mom_pins [20] = {2,4,5,13,14,15,16,17,18,19,23,25,26,27,32,33};
+int mom_pins [20] = {22,4,5,13,14,15,16,17,18,19,23,25,26,27,32,33};
 
 enum ButtonState {
   OFF,

@@ -1,4 +1,4 @@
-#include <ETH.h>
+#include <ETH.h>           // For WT32-ETH01
 #include <WiFiClient.h>
 #include <PubSubClient.h>
 #include <EEPROM.h>
@@ -165,100 +165,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 }
 
-
-void callback3(char* topic, byte* payload, unsigned int length) {
-    String message = "";
-    for (int i = 0; i < length; i++) {
-        message += (char)payload[i];
-    }
-
-    if (strcmp(topic, "broadcast") == 0) {
-        if (message == "ping") {
-          publish_reporting_json();
-        }
-        else if (message == "restart") {
-            delay(10000);
-            ESP.restart();
-        }
-    } else if (strcmp(topic, device_id) == 0) {
-        if (message == "restart") ESP.restart();
-        else if (message == "reset") {
-            for (int i = 0; i < 222; i++) EEPROM.write(i, 255);
-            for (int i = 231; i < 512; i++) EEPROM.write(i, 255);
-            EEPROM.write(230, 's');
-            EEPROM.commit();
-            ESP.restart();
-        }
-    } else {
-          client.publish("debug", (String("Message arrived on topic: ")+String(topic)).c_str());
-          client.publish("debug", (String(" Message: ") + message).c_str());
-          
-          // Check topic length
-          int topicLength = strlen(topic);
-          client.publish("debug", ("Topic Length: " + String(topicLength)).c_str());
-
-          // Copy topic and message into the structure
-          strncpy(outgoingData.topic, topic, sizeof(outgoingData.topic) - 1);
-          outgoingData.topic[sizeof(outgoingData.topic) - 1] = '\0'; // Ensure null-termination
-          if (topicLength >= sizeof(outgoingData.topic)) {
-              client.publish("debug", "Warning: Topic truncated");
-          }
-          message.toCharArray(outgoingData.message, sizeof(outgoingData.message));
-
-          // Debug: Publish the UART message to MQTT using manual string construction
-          String debugTopic = "";
-          for (int i = 0; i < sizeof(outgoingData.topic) && outgoingData.topic[i] != '\0'; i++) {
-              debugTopic += outgoingData.topic[i];
-          }
-          String debugMessage = "UART Send: Topic: " + debugTopic + " Message: " + String(outgoingData.message);
-          client.publish("debug", debugMessage.c_str());
-
-          // Send the data over UART
-          UART_custom.write((uint8_t*)&outgoingData, sizeof(outgoingData));
-          client.publish("debug", "Data sent via UART");
-    }
-}
-
-
-
-void callback2(char* topic, byte* payload, unsigned int length) {
-    String message = "";
-    for (int i = 0; i < length; i++) {
-        message += (char)payload[i];
-    }
-    client.publish("debug", (String("Message arrived on topic: ")+String(topic)).c_str());
-    client.publish("debug", (String(" Message: ") + message).c_str());
-
-    if (strcmp(topic, "broadcast") == 0) {
-        if (message == "ping") {
-          publish_reporting_json();
-        }
-        else if (message == "restart") {
-            delay(10000);
-            ESP.restart();
-        }
-    } else if (strcmp(topic, device_id) == 0) {
-        if (message == "restart") ESP.restart();
-        else if (message == "reset") {
-            for (int i = 0; i < 222; i++) EEPROM.write(i, 255);
-            for (int i = 231; i < 512; i++) EEPROM.write(i, 255);
-            EEPROM.write(230, 's');
-            EEPROM.commit();
-            ESP.restart();
-        }
-        else {
-          // Copy topic and message into the structure
-          strncpy(outgoingData.topic, topic, sizeof(outgoingData.topic) - 1);
-          outgoingData.topic[sizeof(outgoingData.topic) - 1] = '\0'; // Ensure null-termination
-          message.toCharArray(outgoingData.message, sizeof(outgoingData.message));
-
-          // Send the data over UART
-          UART_custom.write((uint8_t*)&outgoingData, sizeof(outgoingData));
-          client.publish("debug", "Data sent via UART");
-        }
-    }
-}
-
 void setupEthernet() {
     ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE, ETH_CLK_MODE);
     Serial.println("Ethernet initialized");
@@ -278,7 +184,11 @@ void publish_reporting_json() {
   state_json["ver"] = ver;
   state_json["IP"] = ETH.localIP();
   state_json["MAC"] = WiFi.macAddress();
-  state_json["pS"]= "0,1,";
+  //state_json["vG"]        = "amp,0,20";
+  state_json["vL"]        = "1,12,onOff;1,12,lux;9,11,temp";
+  state_json["pL"]        = "1,11,";
+  //state_json["pS"]= "0,47,";
+
 
   serializeJson(state_json, output);
   client.publish("reporting", output.c_str());
