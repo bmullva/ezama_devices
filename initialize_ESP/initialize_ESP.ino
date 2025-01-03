@@ -5,7 +5,7 @@
 String type = "Initial";
 String ver = "1.0";
 int addr = 222;
-char id[] = "SECOND00";
+char id[] = "TESTTEST";
 
 
 // 2 REPORT (SENT EVERY 6 SECONDS)
@@ -20,9 +20,9 @@ void publish_reporting_json() {
   state_json["IP"] = WiFi.localIP();
   state_json["MAC"] = WiFi.macAddress();
   //state_json["vG"]        = "amp,0,20";
-  //state_json["vL"]        = "1,4,onOff;1,4,lux;1,4,temp";
-  //state_json["pL"]        = "1,4,";
-  state_json["pS"]= "0,47,";
+  state_json["vL"]        = "1,12,onOff;1,12,lux;9,11,temp";
+  state_json["pL"]        = "1,11,";
+  //state_json["pS"]= "0,47,";
   serializeJson(state_json, output);
   output.toCharArray(sj, 1024);
   client.publish(topic.c_str(), sj);
