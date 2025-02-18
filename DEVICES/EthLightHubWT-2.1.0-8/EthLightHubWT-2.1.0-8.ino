@@ -120,6 +120,17 @@ void reconnect() {
         if (client.connect(device_id)) {
             Serial.println("connected");
             client.subscribe("broadcast");
+            for(int i = 1; i <= SIMPLE_LIGHT_NUM; i++) {
+              client.subscribe((String(device_id) + "/" + String("onOff") + String(i)).c_str());
+              client.subscribe((String(device_id)+"/"+String("lux")+String(i)).c_str());
+              client.subscribe((String(device_id)+"/"+String(i)).c_str());
+            }
+            for(int i = SIMPLE_LIGHT_NUM+1; i <= 12; i+=2) {
+              client.subscribe((String(device_id) + "/" + String("onOff") + String(i)).c_str());
+              client.subscribe((String(device_id)+"/"+String("lux")+String(i)).c_str());
+              client.subscribe((String(device_id)+"/"+String("temp")+String(i)).c_str());
+              client.subscribe((String(device_id)+"/"+String(i)).c_str());
+            }
         } else {
             Serial.print("failed, rc=");
             Serial.print(client.state());
